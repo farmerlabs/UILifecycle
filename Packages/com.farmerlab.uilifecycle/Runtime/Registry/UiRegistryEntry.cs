@@ -71,7 +71,7 @@ namespace UiLifecycle
         ///
         /// SceneAsset は Editor 専用型でビルドに残せないため、実行時の真実は常に _sceneName。
         /// アタッチはリネーム追従と typo 防止のための入力補助であって、経路が 2 つになるわけではない。
-        /// 未アタッチなら _sceneName には触らない — 手打ちも従来どおり有効。
+        /// 未アタッチなら _sceneName には触らない — 手打ちも有効。
         /// </summary>
         internal void SyncSceneName()
         {

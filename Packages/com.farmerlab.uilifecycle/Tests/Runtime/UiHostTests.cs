@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 namespace UiLifecycle.Tests
 {
     /// <summary>
-    /// PlayMode テスト。設計 (Documents/PoC/UIライフサイクル基盤_v2) の核心主張を検証する:
+    /// PlayMode テスト。この基盤の核心主張を検証する:
     ///  1. 表示ごとの引数注入で 3 ポリシーの挙動が揃う
     ///  2. Construct は Start より前
     ///  3. 結果は ShowForResultAsync の戻り値 (配線ゼロ)

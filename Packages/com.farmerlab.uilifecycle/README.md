@@ -3,8 +3,6 @@
 UI の存在状態（Hidden / Showing / Shown / Hiding）を標準化し、遷移点に「完了を返せる何か」を差せるようにする基盤。
 実体は **Unity のコンポーネントに欠けているコンストラクタを、UI の生成に取り戻すこと**。
 
-設計資料: `Documents/PoC/UIライフサイクル基盤_v2/`（構造図 + UseCase 図 + README_v2.1.md）
-
 ---
 
 ## 1. 動作要件
@@ -357,7 +355,7 @@ EntryPoint と同じ GameObject に付けるだけで自動収集される:
 
 テスト assembly は `UNITY_INCLUDE_TESTS` 制約付きなので、ビルドには含まれない。
 
-## 12. PoC の既知の割り切り
+## 12. 現時点の制約
 
 - `CancellationToken` キャンセル時の途中巻き戻しは最小限。**調達（シーンロード等）は途中で中断しない** — 半ロードの後始末と `ShowAsync` の戻り契約が増えるため、閉じ要求は §10 の預かりで揃えている
 - `Kind = Custom`（Addressables 等、外部依存が要る調達）は差し込み口 `UiHost.RegisterProvider(id, provider)` のみ提供。Provider 実装は製品側
