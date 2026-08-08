@@ -17,6 +17,7 @@
 | [005](005/) | 寿命 | `LifetimePolicy` = `Transient` / `Cached` / `Persistent` |
 | [006](006/) | 演出 | Presenter が 0 個 / 1 個 / 複数（`Parallel` / `Sequential`） |
 | [007](007/) | 供給手段 | `ProviderKind` = `AdditiveScene`（Prefab との差は Registry の 1 値だけ） |
+| [008](008/) | 供給手段 | `ProviderKind` = `Custom`（調達を外から差す。例として生成先を指定） |
 
 ## なぜ 4 通りなのか（8 でも 6 でもなく）
 
