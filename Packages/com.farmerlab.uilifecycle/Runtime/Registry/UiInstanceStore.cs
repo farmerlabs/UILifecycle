@@ -15,7 +15,7 @@ namespace UiLifecycle
             if (_instances.TryGetValue(key, out entryPoint))
             {
                 // Destroy 済み (シーン遷移等) の残骸は無効扱い
-                if (entryPoint is UnityEngine.Object obj && obj == null)
+                if (!UiObject.IsAlive(entryPoint))
                 {
                     _instances.Remove(key);
                     entryPoint = null;

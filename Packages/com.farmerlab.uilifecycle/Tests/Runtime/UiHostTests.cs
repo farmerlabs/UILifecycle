@@ -293,5 +293,46 @@ namespace UiLifecycle.Tests
                 Assert.That(e.Message, Does.Contain("Page"), "key 入りのメッセージで原因が追える");
             }
         });
+
+        [UnityTest]
+        public IEnumerator 実体が先に破棄されてもHideは例外にならずキャンセルで返る() => UniTask.ToCoroutine(async () =>
+        {
+            var host = CreateHost(LifetimePolicy.Transient);
+
+            var showTask = host.ShowForResultAsync<TestArgs, string>("Page", new TestArgs(1));
+            var page = FindActivePage();
+
+            // シーン遷移などで実体だけが先に消えた状況。
+            // Unity の破棄済み判定はインターフェース型では効かないため、
+            // 素の != null / ?. のままだと退場〜解放で MissingReferenceException になる
+            Object.DestroyImmediate(page.gameObject);
+
+            Assert.That(host.IsShown("Page"), Is.False, "破棄済みを「表示中」と答えない");
+
+            await host.HideAsync("Page");
+            var result = await showTask;
+
+            Assert.That(result.HasValue, Is.False, "開いた本人の await はキャンセルで返る");
+            Assert.That(host.IsShown("Page"), Is.False);
+        });
+
+        [UnityTest]
+        public IEnumerator 実体が先に破棄されても裏の閉じフローが例外を出さない() => UniTask.ToCoroutine(async () =>
+        {
+            // ShowAsync 経由は RunCloseFlowAsync が裏で回るため、
+            // 例外は呼び側に伝播せずログに出るだけになる (気づけない側の経路)
+            var host = CreateHost(LifetimePolicy.Transient);
+
+            await host.ShowAsync("Page", new TestArgs(1));
+            var page = FindActivePage();
+
+            Object.DestroyImmediate(page.gameObject);
+
+            await host.HideAsync("Page");
+            await UniTask.Yield();
+
+            LogAssert.NoUnexpectedReceived();
+            Assert.That(host.IsShown("Page"), Is.False, "セッションが畳まれ、key が死なない");
+        });
     }
 }

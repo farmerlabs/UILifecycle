@@ -102,7 +102,9 @@ namespace UiLifecycle
         {
             get
             {
-                if (_presenter != null) return _presenter;
+                // 破棄済みの Presenter をキャッシュから返さない (収集し直す)。
+                // IUiTransitionPresenter はインターフェース型なので素の != null では検出できない
+                if (UiObject.IsAlive(_presenter)) return _presenter;
 
                 var found = new List<IUiTransitionPresenter>();
                 GetComponents(found);

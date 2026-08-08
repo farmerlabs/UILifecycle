@@ -83,7 +83,8 @@ namespace UiLifecycle
 
         public UniTask ReleaseAsync(IUiEntryPoint entryPoint, CancellationToken ct)
         {
-            if (entryPoint?.Root == null) return UniTask.CompletedTask;
+            // 破棄済みの実体に .Root を触ると MissingReferenceException (?. では検出できない)
+            if (!UiObject.IsAlive(entryPoint) || entryPoint.Root == null) return UniTask.CompletedTask;
 
             var scene = entryPoint.Root.scene;
             if (!scene.IsValid() || !scene.isLoaded) return UniTask.CompletedTask;

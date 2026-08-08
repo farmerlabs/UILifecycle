@@ -39,7 +39,11 @@ namespace UiLifecycle
 
         public UniTask ReleaseAsync(IUiEntryPoint entryPoint, CancellationToken ct)
         {
-            if (entryPoint?.Root != null)
+            // 破棄済みの実体に .Root (= gameObject) を触ると MissingReferenceException。
+            // ?. は素の参照比較なので、ここを通り抜けてしまう
+            if (!UiObject.IsAlive(entryPoint)) return UniTask.CompletedTask;
+
+            if (entryPoint.Root != null)
                 UnityEngine.Object.Destroy(entryPoint.Root);
             return UniTask.CompletedTask;
         }
