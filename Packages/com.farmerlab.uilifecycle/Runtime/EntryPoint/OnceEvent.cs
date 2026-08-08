@@ -3,9 +3,8 @@ using System;
 namespace UiLifecycle
 {
     /// <summary>
-    /// IOnceEvent の最小実装。
-    /// 表示ごとに Construct が呼ばれるため、厳密には「最新値を記憶し
-    /// 購読時に即再生する」イベント (BehaviorSubject 相当) として振る舞う。
+    /// IOnceEvent の最小実装 (ReplaySubject(1) 相当)。
+    /// 最新値を保持し、購読時に発火済みなら即再生する。
     /// </summary>
     public sealed class OnceEvent<T> : IOnceEvent<T>
     {
