@@ -39,7 +39,9 @@ namespace UiLifecycle
 
         public UniTask ReleaseAsync(IUiEntryPoint entryPoint, CancellationToken ct)
         {
-            if (entryPoint?.Root != null)
+            if (!UiObject.IsAlive(entryPoint)) return UniTask.CompletedTask;
+
+            if (entryPoint.Root != null)
                 UnityEngine.Object.Destroy(entryPoint.Root);
             return UniTask.CompletedTask;
         }

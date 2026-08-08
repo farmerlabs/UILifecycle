@@ -83,7 +83,7 @@ namespace UiLifecycle
 
         public UniTask ReleaseAsync(IUiEntryPoint entryPoint, CancellationToken ct)
         {
-            if (entryPoint?.Root == null) return UniTask.CompletedTask;
+            if (!UiObject.IsAlive(entryPoint) || entryPoint.Root == null) return UniTask.CompletedTask;
 
             var scene = entryPoint.Root.scene;
             if (!scene.IsValid() || !scene.isLoaded) return UniTask.CompletedTask;

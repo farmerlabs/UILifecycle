@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
@@ -249,7 +250,7 @@ namespace UiLifecycle.Tests
             var result = await showTask;
             Assert.That(result.HasValue, Is.False, "調達中の Hide が握り潰されずキャンセルになる");
 
-            // 修正前はここが永遠に返らなかった (誰も閉じないため Completion が立たない)
+            // 回帰してもハングせず落ちるよう 1 秒で切る
             var finished = await UniTask.WhenAny(hideTask, UniTask.Delay(1000, DelayType.Realtime));
             Assert.That(finished, Is.EqualTo(0), "HideAsync の await が返る");
 
@@ -292,6 +293,164 @@ namespace UiLifecycle.Tests
             {
                 Assert.That(e.Message, Does.Contain("Page"), "key 入りのメッセージで原因が追える");
             }
+        });
+
+        [UnityTest]
+        public IEnumerator 実体が先に破棄されてもHideは例外にならずキャンセルで返る() => UniTask.ToCoroutine(async () =>
+        {
+            var host = CreateHost(LifetimePolicy.Transient);
+
+            var showTask = host.ShowForResultAsync<TestArgs, string>("Page", new TestArgs(1));
+            var page = FindActivePage();
+
+            // シーン遷移などで実体だけが先に消えた状況
+            Object.DestroyImmediate(page.gameObject);
+
+            Assert.That(host.IsShown("Page"), Is.False, "破棄済みを「表示中」と答えない");
+
+            await host.HideAsync("Page");
+            var result = await showTask;
+
+            Assert.That(result.HasValue, Is.False, "開いた本人の await はキャンセルで返る");
+            Assert.That(host.IsShown("Page"), Is.False);
+        });
+
+        [UnityTest]
+        public IEnumerator 実体が先に破棄されても裏の閉じフローが例外を出さない() => UniTask.ToCoroutine(async () =>
+        {
+            // ShowAsync 経由は例外が呼び側に伝播せずログに出るだけ = 気づけない側の経路
+            var host = CreateHost(LifetimePolicy.Transient);
+
+            await host.ShowAsync("Page", new TestArgs(1));
+            var page = FindActivePage();
+
+            Object.DestroyImmediate(page.gameObject);
+
+            await host.HideAsync("Page");
+            await UniTask.Yield();
+
+            LogAssert.NoUnexpectedReceived();
+            Assert.That(host.IsShown("Page"), Is.False, "セッションが畳まれ、key が死なない");
+        });
+
+        [UnityTest]
+        public IEnumerator Hideを呼ばずに破棄されてもkeyが死なない() => UniTask.ToCoroutine(async () =>
+        {
+            // シーン遷移で UI ごと消える形。誰も HideAsync を呼ばないので、
+            // 破棄を知る経路が無いと閉じ待ちが畳まれず、key が永久ロックされる
+            var host = CreateHost(LifetimePolicy.Transient);
+
+            // UniTask は既定で 1 回しか await できないため、完了待ちと結果取り出しを分ける
+            UiResult<string> outcome = default;
+            var showTask = UniTask.Create(async () =>
+            {
+                outcome = await host.ShowForResultAsync<TestArgs, string>("Page", new TestArgs(1));
+            });
+
+            var page = FindActivePage();
+            Assert.That(page, Is.Not.Null);
+
+            // Destroy はフレーム末。シーン遷移と同じく後始末が呼び出し元の外で走る
+            Object.Destroy(page.gameObject);
+            await UniTask.Yield();
+
+            // 回帰してもハングせず落ちるよう 1 秒で切る
+            var finished = await UniTask.WhenAny(showTask, UniTask.Delay(1000, DelayType.Realtime));
+            Assert.That(finished, Is.EqualTo(0), "実体の破棄で閉じ待ちが畳まれる");
+            Assert.That(outcome.HasValue, Is.False, "確定は子しか作れないのでキャンセルで返る");
+
+            var reopen = host.ShowForResultAsync<TestArgs, string>("Page", new TestArgs(2));
+            var reopened = FindActivePage();
+            Assert.That(reopened, Is.Not.Null, "セッションが残っていると再入ガードに弾かれ、ここが null になる");
+            Assert.That(reopened.LastArgs?.Id, Is.EqualTo(2), "開き直した先に新しい引数が届く");
+
+            reopened.DoClose("b");
+            Assert.That((await reopen).Value, Is.EqualTo("b"), "開き直した後も結果が戻る");
+        });
+
+        [UnityTest]
+        public IEnumerator Hideを呼ばずに破棄されてもkeyが死なない_裏の閉じフロー() => UniTask.ToCoroutine(async () =>
+        {
+            // 呼び側は既に await を抜けているため、裏が詰まっても気づく手段が無い経路
+            var host = CreateHost(LifetimePolicy.Transient);
+
+            await host.ShowAsync("Page", new TestArgs(1));
+            var page = FindActivePage();
+            Assert.That(page, Is.Not.Null);
+
+            Object.Destroy(page.gameObject);
+            await UniTask.Yield();
+
+            await host.ShowAsync("Page", new TestArgs(2));
+            var reopened = FindActivePage();
+            Assert.That(reopened, Is.Not.Null, "裏のフローが畳まれないと再入ガードに弾かれる");
+            Assert.That(reopened.LastArgs?.Id, Is.EqualTo(2));
+
+            LogAssert.NoUnexpectedReceived();
+        });
+
+        [UnityTest]
+        public IEnumerator キャンセルで中断しても実体が解放される() => UniTask.ToCoroutine(async () =>
+        {
+            var host = CreateHost(LifetimePolicy.Transient);
+            var cts = new CancellationTokenSource();
+
+            var showTask = host.ShowForResultAsync<TestArgs, string>("Page", new TestArgs(1), cts.Token);
+            var page = FindActivePage();
+            Assert.That(page, Is.Not.Null);
+
+            cts.Cancel();
+            try
+            {
+                await showTask;
+                Assert.Fail("キャンセルで抜けるはず");
+            }
+            catch (OperationCanceledException) { }
+
+            await UniTask.Yield();
+            Assert.That(page == null, Is.True, "中断した実体は画面に残さず解放する");
+            Assert.That(host.IsShown("Page"), Is.False);
+        });
+
+        [UnityTest]
+        public IEnumerator 型不一致で例外になっても実体が残らない() => UniTask.ToCoroutine(async () =>
+        {
+            // 例外は投げたまま (設定ミスは黙って直さない)。ただし調達済みの実体は畳む
+            var host = CreateHost(LifetimePolicy.Transient);
+
+            try { await host.ShowForResultAsync<int, int>("Page", 1); }
+            catch (InvalidOperationException) { }
+
+            try { await host.ShowAsync<int>("Page", 1); }
+            catch (InvalidOperationException) { }
+
+            await UniTask.Yield();
+            Assert.That(Object.FindObjectsOfType<TestPage>(true).Length, Is.EqualTo(1),
+                "残るのは Instantiate 元のテンプレートだけ (両方の入口で漏らさない)");
+        });
+
+        [UnityTest]
+        public IEnumerator 中断した直後でも同じkeyを開き直せて二重にならない() => UniTask.ToCoroutine(async () =>
+        {
+            var host = CreateHost(LifetimePolicy.Transient);
+            var cts = new CancellationTokenSource();
+
+            var t1 = host.ShowForResultAsync<TestArgs, string>("Page", new TestArgs(1), cts.Token);
+            cts.Cancel();
+            try { await t1; } catch (OperationCanceledException) { }
+            await UniTask.Yield();
+
+            var t2 = host.ShowForResultAsync<TestArgs, string>("Page", new TestArgs(2));
+
+            Assert.That(Object.FindObjectsOfType<TestPage>(true).Length, Is.EqualTo(2),
+                "テンプレート + 新しい実体だけ (前回の残骸が重なっていない)");
+
+            var page = FindActivePage();
+            Assert.That(page.LastArgs?.Id, Is.EqualTo(2));
+
+            page.DoClose("b");
+            var result = await t2;
+            Assert.That(result.Value, Is.EqualTo("b"));
         });
     }
 }
