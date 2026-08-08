@@ -29,5 +29,8 @@ namespace UiLifecycle
         public void Set(string key, IUiEntryPoint entryPoint) => _instances[key] = entryPoint;
 
         public void Remove(string key) => _instances.Remove(key);
+
+        /// <summary>破棄済みの残骸だけ落とす。同じ key に登録し直された実体には触れない</summary>
+        internal void PruneIfDead(string key) => TryGet(key, out _);
     }
 }

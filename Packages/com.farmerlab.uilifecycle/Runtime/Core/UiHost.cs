@@ -14,9 +14,7 @@ namespace UiLifecycle
     /// ・再入 (同一 key の実行中に再度 ShowAsync) は「無視」— ただし await は必ず返す
     ///   (即座に HasValue=false)。ゲートはこの入口 1 箇所。無視/待つ/上書きは
     ///   戻り値契約が共通なので、後から方式を変えても呼び側は無変更。
-    /// ・中断 (設定ミスの例外 / ct キャンセル / 演出中の例外) は「閉じる」ではないので
-    ///   退場演出を通さない。演出は「正常に閉じた」ことの表現であり、
-    ///   中断の後始末は必ず終わることを優先する (AbortAsync)。
+    /// ・中断 (例外 / ct キャンセル) は「閉じる」ではないので退場演出を通さない (AbortAsync)。
     ///
     /// 純 C# クラス。公開の仕方 (DI / シングルトン / 直接 new) は使用者のアーキテクチャに委ねる。
     /// </summary>
@@ -56,8 +54,7 @@ namespace UiLifecycle
 
         public bool IsShown(string key)
         {
-            // 破棄済み (シーン遷移で実体だけ先に消えた) を「表示中」と答えない。
-            // EntryPoint はインターフェース型なので素の != null では検出できない
+            // 破棄済み (シーン遷移で実体だけ消えた) を「表示中」と答えない
             return _sessions.TryGetValue(key, out var session)
                 && UiObject.IsAlive(session.EntryPoint)
                 && session.EntryPoint.Phase is UiPhase.Showing or UiPhase.Shown;
@@ -76,9 +73,7 @@ namespace UiLifecycle
             try
             {
                 var untyped = await AcquireAsync(key, entry, provider, ct);
-                // 型チェックより前に預ける。ここで預けないと、型不一致で抜けたときに
-                // 調達済みの実体が finally から見えず、そのまま宙に浮く
-                session.EntryPoint = untyped;
+                session.EntryPoint = untyped;       // 型チェックより前に預ける (抜けても finally から畳めるように)
 
                 if (untyped is not IUiEntryPoint<TArgs, TResult> typed)
                 {
@@ -96,8 +91,8 @@ namespace UiLifecycle
             }
             finally
             {
-                // 閉じ切っていなければ実体が宙に浮く。再入ガードを効かせたまま畳む
-                if (!closed) await AbortAsync(key, entry, provider, session.EntryPoint);
+                // 再入ガードを効かせたまま畳む
+                if (!closed) await AbortAsync(key, entry, provider, Detach(session));
 
                 _sessions.Remove(key);
                 session.Completion.TrySetResult();
@@ -140,11 +135,10 @@ namespace UiLifecycle
             }
             finally
             {
-                // entered まで来ていれば RunCloseFlowAsync がセッションを引き取る。
-                // 来ていなければここが最後の持ち主なので、実体ごと畳む
+                // entered まで来ていれば RunCloseFlowAsync が引き取る
                 if (!entered)
                 {
-                    await AbortAsync(key, entry, provider, session.EntryPoint);
+                    await AbortAsync(key, entry, provider, Detach(session));
                     _sessions.Remove(key);
                     session.Completion.TrySetResult();
                 }
@@ -164,10 +158,8 @@ namespace UiLifecycle
             // 開いた本人の ShowAsync はキャンセル (HasValue=false) で返る。
             // 調達中 (EntryPoint がまだ無い) なら印だけ残し、Construct 直後に効かせる
             // — 「入場演出中の Hide」と同じ挙動 (最後まで再生してから退場) に揃う。
-            //
-            // 実体が破棄済みでも RequestCancel は呼ぶ。触るのは待ち合わせ用の
-            // UniTaskCompletionSource だけで Unity 側に触れず、逆に呼ばないと
-            // 開いた本人の await が永久に返らない (実体の生死判定は CloseAsync 側で行う)。
+            // 破棄済みでも呼ぶ (触るのは待ち合わせ用の CTS だけ。呼ばないと
+            // 開いた本人の await が返らない)。生死判定は CloseAsync 側。
             session.CancelRequested = true;
             session.EntryPoint?.RequestCancel();
             await session.Completion.Task.AttachExternalCancellation(ct);
@@ -186,29 +178,33 @@ namespace UiLifecycle
             }
             finally
             {
-                if (!closed) await AbortAsync(key, entry, provider, entryPoint);
+                if (!closed) await AbortAsync(key, entry, provider, Detach(session));
 
                 _sessions.Remove(key);
                 session.Completion.TrySetResult();
             }
         }
 
+        /// <summary>畳む対象をセッションから外して返す (畳んでいる最中を IsShown に見せない)</summary>
+        private static IUiEntryPoint Detach(Session session)
+        {
+            var entryPoint = session.EntryPoint;
+            session.EntryPoint = null;
+            return entryPoint;
+        }
+
         private async UniTask CloseAsync(string key, UiRegistryEntry entry, IUiInstanceProvider provider, IUiEntryPoint entryPoint, CancellationToken ct)
         {
-            // 実体が先に消えている (シーン遷移でページごと破棄された等)。
-            // 退場演出も解放も対象が無く、触れば MissingReferenceException になるだけなので
-            // 帳簿を畳んで抜ける。セッションの後始末は呼び元の finally が行う
+            // 実体が先に消えている。退場も解放も対象が無いので帳簿だけ畳む
             if (!UiObject.IsAlive(entryPoint))
             {
-                // Store 側の残骸は UiInstanceStore.TryGet が自分で落とす。
-                // ここで無条件に Remove すると、同じ key に新しい実体が
-                // 登録し直されていた場合にそれまで消してしまう
-                _registry.Store.TryGet(key, out _);
+                _registry.Store.PruneIfDead(key);
                 return;
             }
 
             await entryPoint.ExitAsync(ct);          // 退場演出の完了待ち。これより前に解放しない
 
+            // provider が null なのは SceneObject = Persistent 限定なのでここには来ない
             if (entry.Policy == LifetimePolicy.Transient)
             {
                 _registry.Store.Remove(key);
@@ -217,35 +213,27 @@ namespace UiLifecycle
         }
 
         /// <summary>
-        /// 表示が最後まで到達しなかったときの後始末。CloseAsync とは別扱いにしている。
+        /// 表示が最後まで到達しなかったときの後始末。退場演出は通さない —
+        /// 演出は「正常に閉じた」ことの表現であり、中断は「必ず終わること」を優先する
+        /// (入場前の実体は非アクティブで演出が進まない実装があり、ct キャンセルの典型は
+        /// シーン破棄の直前で演出中に対象が消える)。
         ///
-        /// 退場演出を通さないのは、演出が「正常に閉じた」ことの表現だから。加えて
-        /// 中断の後始末は必ず終わることが最優先で、ここで演出を待つと
-        ///   ・入場前の実体はまだ非アクティブで、演出が進まない実装がある
-        ///   ・ct キャンセルの典型はシーン破棄の直前で、演出中に対象が消える
-        /// のどちらでも止まりうる。よって実体を畳むことだけを行う。
-        ///
-        /// ct を受け取らないのは、中断の原因が ct である以上そこに同じ ct を使えないため。
-        /// 例外を外に出さないのは、後始末の失敗で原因の例外を隠さないため (ログには出す)。
-        ///
-        /// Phase は入場前なら Hidden のままで正しく、入場後は Shown/Showing が残るが
-        /// 次の EnterAsync が上書きする。これを戻すためだけに IUiEntryPoint
-        /// (= UiHost が型を知らずに操作するための最小契約) へ動詞は足さない。
+        /// ct を受け取らないのは中断の原因が ct でありうるため。例外を握るのは、
+        /// 後始末の失敗で原因の例外を隠さないため (ログには出す)。
+        /// Phase は次の EnterAsync が上書きするので戻さない。
         /// </summary>
         private async UniTask AbortAsync(string key, UiRegistryEntry entry, IUiInstanceProvider provider, IUiEntryPoint entryPoint)
         {
             try
             {
-                // 調達前に失敗した (null) 場合と、既に破棄済みの場合はどちらも解放対象が無い。
-                // 破棄済みの残骸が Store に残っていれば TryGet が落とす
+                // 調達前 (null) と破棄済みはどちらも解放対象が無い
                 if (!UiObject.IsAlive(entryPoint))
                 {
-                    _registry.Store.TryGet(key, out _);
+                    _registry.Store.PruneIfDead(key);
                     return;
                 }
 
-                // 解放は Transient だけ (CloseAsync と同じ規則)。それ以外は
-                // 次の表示で再利用する側なので、休息状態 = 非表示に戻すだけ
+                // 解放は Transient だけ (CloseAsync と同じ規則)。再利用する側は非表示に戻すだけ
                 if (entryPoint.Root != null) entryPoint.Root.SetActive(false);
 
                 if (entry.Policy == LifetimePolicy.Transient)

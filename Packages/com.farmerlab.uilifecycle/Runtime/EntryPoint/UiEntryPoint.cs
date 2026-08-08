@@ -15,6 +15,7 @@ namespace UiLifecycle
     ///   呼び側とページの間にイベント購読もコールバック登録も要らない。
     /// ・演出は同じ GameObject の IUiTransitionPresenter コンポーネントを自動収集する。
     ///   0 個 → Immediate (即完了)、複数 → Composite(Parallel) で合成。
+    /// ・外から破棄されたら閉じ待ちはキャンセルで畳まれる (HookDestroy)。
     /// </summary>
     public abstract class UiEntryPoint<TArgs, TResult> : MonoBehaviour, IUiEntryPoint<TArgs, TResult>
     {
@@ -24,6 +25,8 @@ namespace UiLifecycle
         private readonly OnceEvent<TArgs> _onConstructed = new();
         private UniTaskCompletionSource<UiResult<TResult>> _closeSource;
         private IUiTransitionPresenter _presenter;
+        private bool _destroyHooked;
+        private bool _destroyed;
 
         public UiPhase Phase { get; private set; } = UiPhase.Hidden;
         public GameObject Root => gameObject;
@@ -42,6 +45,7 @@ namespace UiLifecycle
         public void Construct(TArgs args)
         {
             _closeSource = new UniTaskCompletionSource<UiResult<TResult>>();
+            HookDestroy();
             OnShow(args);
             _onConstructed.Emit(args);
         }
@@ -56,6 +60,13 @@ namespace UiLifecycle
 
         public async UniTask ExitAsync(CancellationToken ct)
         {
+            // 破棄中は演出も非表示化も対象が無い (この時点では == null がまだ false)
+            if (_destroyed)
+            {
+                Phase = UiPhase.Hidden;
+                return;
+            }
+
             Phase = UiPhase.Hiding;
             await Presenter.PlayExitAsync(ct);
             gameObject.SetActive(false);
@@ -98,13 +109,29 @@ namespace UiLifecycle
             _closeSource?.TrySetResult(UiResult<TResult>.Canceled());
         }
 
+        /// <summary>
+        /// 外からの破棄 (シーン遷移等) で閉じ待ちを畳む。畳まないと UiHost の
+        /// セッションが残り、その key が二度と開かなくなる。
+        /// OnDestroy を使わないのは、使用者が同名メソッドを書くと Unity の
+        /// メッセージ配送が派生側だけを呼び、ここが黙って消えるため。
+        /// </summary>
+        private void HookDestroy()
+        {
+            if (_destroyHooked) return;
+            _destroyHooked = true;
+
+            destroyCancellationToken.Register(() =>
+            {
+                _destroyed = true;      // RequestCancel の継続が同期で走るので先に立てる
+                RequestCancel();
+            });
+        }
+
         private IUiTransitionPresenter Presenter
         {
             get
             {
-                // 破棄済みの Presenter をキャッシュから返さない (収集し直す)。
-                // IUiTransitionPresenter はインターフェース型なので素の != null では検出できない
-                if (UiObject.IsAlive(_presenter)) return _presenter;
+                if (UiObject.IsAlive(_presenter)) return _presenter;   // 破棄済みなら収集し直す
 
                 var found = new List<IUiTransitionPresenter>();
                 GetComponents(found);

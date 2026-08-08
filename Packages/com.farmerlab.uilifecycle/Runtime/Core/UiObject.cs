@@ -3,13 +3,10 @@ namespace UiLifecycle
     /// <summary>
     /// 破棄済み Unity オブジェクトの判定を 1 箇所に集める。
     ///
-    /// Unity の Object は Destroy 後も == null が true を返すが、これは
-    /// UnityEngine.Object 型として比較したときだけ効く演算子オーバーロード。
-    /// 本パッケージは実体を IUiEntryPoint / IUiTransitionPresenter という
-    /// インターフェース型で持ち回るため、素の != null や ?. は参照比較に落ち、
-    /// 破棄済みを素通りさせる (次に Unity 側へ触れた瞬間 MissingReferenceException)。
-    ///
-    /// 「判定を書く箇所ごとに間違えられる」形にしないための型。
+    /// Destroy 後に == null が true を返すのは UnityEngine.Object 型として比較したときだけ。
+    /// 本パッケージは実体を IUiEntryPoint / IUiTransitionPresenter で持ち回るため、
+    /// 素の != null や ?. は参照比較に落ちて破棄済みを素通りさせる
+    /// (次に Unity 側へ触れた瞬間 MissingReferenceException)。
     /// </summary>
     internal static class UiObject
     {

@@ -66,3 +66,5 @@ crashlytics-build.properties
 AssetBundles/
 # Addressable generation directory
 ServerData/
+Assets/Locals/
+Assets/Locals.meta
