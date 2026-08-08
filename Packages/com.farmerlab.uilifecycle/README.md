@@ -14,7 +14,33 @@ UI の存在状態（Hidden / Showing / Shown / Hiding）を標準化し、遷�
 
 ## 2. インストール
 
-### 2-1. UniTask を導入（未導入の場合）
+> **本リポジトリは private です。** 事前に作者から招待を受け、かつ Git の認証設定が済んでいる必要があります。
+> 認証が未設定だと、URL を入力しても取得に失敗します（→ [2-1](#2-1-git-認証を確認未設定の場合)）。
+
+順序が重要です。**2-1 → 2-2 → 2-3 の順に実施してください。**
+
+### 2-1. Git 認証を確認（未設定の場合）
+
+Unity Package Manager は内部で `git` コマンドを呼ぶため、Unity ではなく **OS 側の Git が GitHub に認証できる状態**である必要があります。
+
+ターミナルで以下が成功すれば準備完了です。
+
+```
+git ls-remote https://github.com/Farmer0116/UILifecycle.git
+```
+
+失敗する場合は、次のいずれかを設定してください。
+
+| 方式 | 設定内容 |
+|---|---|
+| HTTPS | [Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager) を導入し、GitHub にサインイン |
+| SSH | GitHub に SSH 公開鍵を登録（この場合、後述の URL を `ssh://git@github.com/Farmer0116/UILifecycle.git?path=...` に置き換える） |
+
+### 2-2. UniTask を導入（必須・本パッケージより先に）
+
+本パッケージは UniTask に依存します。private リポジトリ配布のため `package.json` に依存を宣言できず、**手動導入が必須**です。
+
+先に本パッケージを入れるとコンパイルエラーになるので、**必ず UniTask を先に導入してください。**
 
 Package Manager > `+` > *Add package from git URL...*
 
@@ -22,15 +48,30 @@ Package Manager > `+` > *Add package from git URL...*
 https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask
 ```
 
-### 2-2. 本パッケージを配置
+### 2-3. 本パッケージを導入
 
-`com.farmerlab.uilifecycle` フォルダごと対象プロジェクトの `Packages/` 直下へコピー（embedded package として認識される）。
+Package Manager > `+` > *Add package from git URL...*
 
 ```
-<YourProject>/Packages/com.farmerlab.uilifecycle/
+https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.0
 ```
+
+`?path=` はリポジトリ内のパッケージ位置、`#v0.1.0` は取得するタグです。
+タグを省略するとデフォルトブランチの最新が取得され、予告なく変わります。**試用時はタグを明示してください。**
 
 Unity を開いてコンパイルが通れば導入完了。
+
+### 2-4. サンプルをインポート（任意）
+
+Package Manager > 本パッケージを選択 > **Samples** タブ > *Sample UI Lifecycle* の **Import**
+
+以下に展開されます。
+
+```
+Assets/Samples/Farmer Lab UI Lifecycle/0.1.0/Sample UI Lifecycle/
+```
+
+001〜008 の番号付きフォルダに、機能ごとのシーンと解説 README が入っています。まず `001` のシーンを開いて再生するのが最短です。
 
 ---
 
