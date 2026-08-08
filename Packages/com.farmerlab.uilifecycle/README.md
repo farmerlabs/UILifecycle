@@ -10,7 +10,7 @@ UI の存在状態（Hidden / Showing / Shown / Hiding）を標準化し、遷�
 | 項目 | 要件 |
 |---|---|
 | Unity | 2022.3 以降 |
-| 依存 | **UniTask のみ**（UniRx / Zenject / Feel / Addressables 不要） |
+| 依存 | **UniTask 2.5.11 以上のみ**
 
 ## 2. インストール
 
@@ -36,17 +36,43 @@ git ls-remote https://github.com/Farmer0116/UILifecycle.git
 | HTTPS | [Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager) を導入し、GitHub にサインイン |
 | SSH | GitHub に SSH 公開鍵を登録（この場合、後述の URL を `ssh://git@github.com/Farmer0116/UILifecycle.git?path=...` に置き換える） |
 
-### 2-2. UniTask を導入（必須・本パッケージより先に）
+### 2-2. UniTask を用意（必須）
 
-本パッケージは UniTask に依存します。private リポジトリ配布のため `package.json` に依存を宣言できず、**手動導入が必須**です。
+本パッケージは **UniTask 2.5.11 以上**に依存します。以下の A / B いずれかを選んでください。
 
-先に本パッケージを入れるとコンパイルエラーになるので、**必ず UniTask を先に導入してください。**
+#### 2-2-A. OpenUPM 経由（推奨）
+
+プロジェクトの `Packages/manifest.json` に、スコープドレジストリを追記します。
+
+```jsonc
+{
+  "dependencies": { /* 既存のまま */ },
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [ "com.cysharp.unitask" ]
+    }
+  ]
+}
+```
+
+これだけで完了です。UniTask は本パッケージの `dependencies` により **2-3 で自動的に導入**されます。手動でのインストールは不要です。
+
+#### 2-2-B. git URL 経由（代替）
+
+OpenUPM を使えない場合はこちら。ただし次の 2 点を守る必要があります。
+
+- **バージョンは 2.5.11 以上**（本パッケージが要求する下限）
+- **必ず本パッケージ（2-3）より先に導入する**
 
 Package Manager > `+` > *Add package from git URL...*
 
 ```
 https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask
 ```
+
+> 順序を誤って本パッケージを先に入れると、UPM が UniTask をレジストリから探しに行き、解決に失敗します。
 
 ### 2-3. 本パッケージを導入
 
@@ -58,6 +84,8 @@ https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilife
 
 `?path=` はリポジトリ内のパッケージ位置、`#v0.1.0` は取得するタグです。
 タグを省略するとデフォルトブランチの最新が取得され、予告なく変わります。**試用時はタグを明示してください。**
+
+2-2-A を選んだ場合は、この時点で UniTask も自動的に取得されます。
 
 Unity を開いてコンパイルが通れば導入完了。
 
