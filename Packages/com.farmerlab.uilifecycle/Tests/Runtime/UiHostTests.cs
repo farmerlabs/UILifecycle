@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
@@ -333,6 +334,70 @@ namespace UiLifecycle.Tests
 
             LogAssert.NoUnexpectedReceived();
             Assert.That(host.IsShown("Page"), Is.False, "セッションが畳まれ、key が死なない");
+        });
+
+        [UnityTest]
+        public IEnumerator キャンセルで中断しても実体が解放される() => UniTask.ToCoroutine(async () =>
+        {
+            var host = CreateHost(LifetimePolicy.Transient);
+            var cts = new CancellationTokenSource();
+
+            var showTask = host.ShowForResultAsync<TestArgs, string>("Page", new TestArgs(1), cts.Token);
+            var page = FindActivePage();
+            Assert.That(page, Is.Not.Null);
+
+            cts.Cancel();
+            try
+            {
+                await showTask;
+                Assert.Fail("キャンセルで抜けるはず");
+            }
+            catch (OperationCanceledException) { }
+
+            await UniTask.Yield();
+            Assert.That(page == null, Is.True, "中断した実体は画面に残さず解放する");
+            Assert.That(host.IsShown("Page"), Is.False);
+        });
+
+        [UnityTest]
+        public IEnumerator 型不一致で例外になっても実体が残らない() => UniTask.ToCoroutine(async () =>
+        {
+            // 例外は投げたまま (設定ミスは黙って直さない)。ただし調達済みの実体は畳む
+            var host = CreateHost(LifetimePolicy.Transient);
+
+            try { await host.ShowForResultAsync<int, int>("Page", 1); }
+            catch (InvalidOperationException) { }
+
+            try { await host.ShowAsync<int>("Page", 1); }
+            catch (InvalidOperationException) { }
+
+            await UniTask.Yield();
+            Assert.That(Object.FindObjectsOfType<TestPage>(true).Length, Is.EqualTo(1),
+                "残るのは Instantiate 元のテンプレートだけ (両方の入口で漏らさない)");
+        });
+
+        [UnityTest]
+        public IEnumerator 中断した直後でも同じkeyを開き直せて二重にならない() => UniTask.ToCoroutine(async () =>
+        {
+            var host = CreateHost(LifetimePolicy.Transient);
+            var cts = new CancellationTokenSource();
+
+            var t1 = host.ShowForResultAsync<TestArgs, string>("Page", new TestArgs(1), cts.Token);
+            cts.Cancel();
+            try { await t1; } catch (OperationCanceledException) { }
+            await UniTask.Yield();
+
+            var t2 = host.ShowForResultAsync<TestArgs, string>("Page", new TestArgs(2));
+
+            Assert.That(Object.FindObjectsOfType<TestPage>(true).Length, Is.EqualTo(2),
+                "テンプレート + 新しい実体だけ (前回の残骸が重なっていない)");
+
+            var page = FindActivePage();
+            Assert.That(page.LastArgs?.Id, Is.EqualTo(2));
+
+            page.DoClose("b");
+            var result = await t2;
+            Assert.That(result.Value, Is.EqualTo("b"));
         });
     }
 }
