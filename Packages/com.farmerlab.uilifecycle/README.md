@@ -10,11 +10,61 @@ UI の存在状態（Hidden / Showing / Shown / Hiding）を標準化し、遷�
 | 項目 | 要件 |
 |---|---|
 | Unity | 2022.3 以降 |
-| 依存 | **UniTask のみ**（UniRx / Zenject / Feel / Addressables 不要） |
+| 依存 | **UniTask 2.5.11 以上のみ**
 
 ## 2. インストール
 
-### 2-1. UniTask を導入（未導入の場合）
+> **本リポジトリは private です。** 事前に作者から招待を受け、かつ Git の認証設定が済んでいる必要があります。
+> 認証が未設定だと、URL を入力しても取得に失敗します（→ [2-1](#2-1-git-認証を確認未設定の場合)）。
+
+順序が重要です。**2-1 → 2-2 → 2-3 の順に実施してください。**
+
+### 2-1. Git 認証を確認（未設定の場合）
+
+Unity Package Manager は内部で `git` コマンドを呼ぶため、Unity ではなく **OS 側の Git が GitHub に認証できる状態**である必要があります。
+
+ターミナルで以下が成功すれば準備完了です。
+
+```
+git ls-remote https://github.com/Farmer0116/UILifecycle.git
+```
+
+失敗する場合は、次のいずれかを設定してください。
+
+| 方式 | 設定内容 |
+|---|---|
+| HTTPS | [Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager) を導入し、GitHub にサインイン |
+| SSH | GitHub に SSH 公開鍵を登録（この場合、後述の URL を `ssh://git@github.com/Farmer0116/UILifecycle.git?path=...` に置き換える） |
+
+### 2-2. UniTask を用意（必須）
+
+本パッケージは **UniTask 2.5.11 以上**に依存します。以下の A / B いずれかを選んでください。
+
+#### 2-2-A. OpenUPM 経由（推奨）
+
+プロジェクトの `Packages/manifest.json` に、スコープドレジストリを追記します。
+
+```jsonc
+{
+  "dependencies": { /* 既存のまま */ },
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [ "com.cysharp.unitask" ]
+    }
+  ]
+}
+```
+
+これだけで完了です。UniTask は本パッケージの `dependencies` により **2-3 で自動的に導入**されます。手動でのインストールは不要です。
+
+#### 2-2-B. git URL 経由（代替）
+
+OpenUPM を使えない場合はこちら。ただし次の 2 点を守る必要があります。
+
+- **バージョンは 2.5.11 以上**（本パッケージが要求する下限）
+- **必ず本パッケージ（2-3）より先に導入する**
 
 Package Manager > `+` > *Add package from git URL...*
 
@@ -22,15 +72,34 @@ Package Manager > `+` > *Add package from git URL...*
 https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask
 ```
 
-### 2-2. 本パッケージを配置
+> 順序を誤って本パッケージを先に入れると、UPM が UniTask をレジストリから探しに行き、解決に失敗します。
 
-`com.farmerlab.uilifecycle` フォルダごと対象プロジェクトの `Packages/` 直下へコピー（embedded package として認識される）。
+### 2-3. 本パッケージを導入
+
+Package Manager > `+` > *Add package from git URL...*
 
 ```
-<YourProject>/Packages/com.farmerlab.uilifecycle/
+https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.0
 ```
+
+`?path=` はリポジトリ内のパッケージ位置、`#v0.1.0` は取得するタグです。
+タグを省略するとデフォルトブランチの最新が取得され、予告なく変わります。**試用時はタグを明示してください。**
+
+2-2-A を選んだ場合は、この時点で UniTask も自動的に取得されます。
 
 Unity を開いてコンパイルが通れば導入完了。
+
+### 2-4. サンプルをインポート（任意）
+
+Package Manager > 本パッケージを選択 > **Samples** タブ > *Sample UI Lifecycle* の **Import**
+
+以下に展開されます。
+
+```
+Assets/Samples/Farmer Lab UI Lifecycle/0.1.0/Sample UI Lifecycle/
+```
+
+001〜008 の番号付きフォルダに、機能ごとのシーンと解説 README が入っています。まず `001` のシーンを開いて再生するのが最短です。
 
 ---
 
