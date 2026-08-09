@@ -22,18 +22,35 @@ namespace UiLifecycle
 
         public IReadOnlyList<UiRegistryEntry> Entries => _entries;
 
-        /// <summary>実行時の実体保持。ドメインリロードで自然にリセットされる</summary>
+        /// <summary>実行時の実体保持</summary>
         public UiInstanceStore Store => _store ??= new UiInstanceStore();
 
         /// <summary>
-        /// 本 Registry に紐づく共有 Host。Store と同じ発想 (SO を接点にする) の遅延生成で、
-        /// ドメインリロードで自然にリセットされる。
+        /// 本 Registry に紐づく共有 Host。Store と同じ発想 (SO を接点にする) の遅延生成。
         /// UiShowButton 等の Inspector 配線コンポーネントはここから Host を得る
         /// (UiHost は純 C# なので SerializeField で参照できない)。
         /// 再入ゲート (sessions) は Host 単位のため、同一 Registry には 1 Host が原則。
         /// 自前の new UiHost(registry) も引き続き可能だが、共有 Host と併用しないこと。
         /// </summary>
         public UiHost Host => _host ??= new UiHost(this);
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// 再生開始時に実行時状態を捨てる。SO はアセットとして常駐するため、
+        /// Enter Play Mode Options でドメインリロードを切っていると前回の再生の
+        /// セッションと実体が持ち越され、その key が「押しても開かない」状態で固定される。
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetRuntimeState()
+        {
+            foreach (var registry in Resources.FindObjectsOfTypeAll<UiRegistryAsset>())
+            {
+                registry._store = null;
+                registry._host = null;
+                registry._index = null;
+            }
+        }
+#endif
 
         public UiRegistryEntry Resolve(string key)
         {

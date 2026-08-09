@@ -11,7 +11,9 @@
       "version": "file:com.farmerlab.uilifecycle",
       "depth": 0,
       "source": "embedded",
-      "dependencies": {}
+      "dependencies": {
+        "com.cysharp.unitask": "2.5.11"
+      }
     },
     "com.unity.2d.animation": {
       "version": "9.2.0",
