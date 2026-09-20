@@ -1,61 +1,45 @@
-Copyright (c) 2026 Farmer Lab. All rights reserved.
+MIT License
 
-## Evaluation License
+Copyright (c) 2026 Farmer Lab
 
-This software and associated files (the "Software") are proprietary and
-confidential. All rights, title, and interest in and to the Software remain
-with Farmer Lab (the "Author").
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-No license, right, or interest in the Software is granted to any person
-except as expressly authorized in writing (including by explicit invitation
-to the private repository) by the Author.
-
-Subject to such authorization, the Author grants a non-exclusive,
-non-transferable, revocable, limited license to install and use the
-Software solely for internal evaluation and testing purposes.
-
-The following are prohibited without prior written consent from the Author:
-
-- Redistribution of the Software, in whole or in part, in source or binary form
-- Sublicensing, selling, or otherwise making the Software available to any
-  third party
-- Use of the Software in any production or commercial product or service
-- Modification and distribution of modified versions of the Software
-
-This authorization may be revoked by the Author at any time, for any reason.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE
-USE OF THE SOFTWARE.
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 ---
 
-## 評価用ライセンス（日本語参考訳）
+## MIT ライセンス（日本語参考訳）
 
-本ソフトウェアおよび関連ファイル（以下「本ソフトウェア」）は、Farmer Lab（以下「作者」）
-の専有物であり、機密情報です。本ソフトウェアに関するすべての権利、権原、および利益は
-作者に帰属します。
+Copyright (c) 2026 Farmer Lab
 
-作者による明示的な許可（プライベートリポジトリへの招待を含む）がない限り、いかなる者にも
-本ソフトウェアに関するライセンス、権利、または利益は付与されません。
+本ソフトウェアおよび関連するドキュメントファイル（以下「本ソフトウェア」）の複製を取得
+するすべての人に対し、以下の条件に従うことを前提に、本ソフトウェアを無制限に取り扱うこと
+を無償で許可します。これには、使用、複製、改変、結合、公開、頒布、サブライセンス、および
+／または販売する権利、ならびに本ソフトウェアの提供を受けた者に同様の権利を許可する権利が
+含まれ、これらに限定されません。
 
-当該許可を得た者に対してのみ、作者は本ソフトウェアを社内評価・試用目的に限り、
-非独占的・譲渡不可・撤回可能・限定的に、インストールおよび使用する権利を許諾します。
+上記の著作権表示および本許諾表示を、本ソフトウェアのすべての複製または重要な部分に記載
+するものとします。
 
-作者の事前の書面による同意がない限り、以下の行為を禁止します：
-
-- 本ソフトウェアの全部または一部を、ソース形式・バイナリ形式を問わず再配布すること
-- 第三者への再許諾、販売、その他の方法で提供すること
-- 本ソフトウェアを本番環境または商用の製品・サービスに使用すること
-- 本ソフトウェアを改変し、改変版を配布すること
-
-この許可は、作者がいつでも、いかなる理由でも取り消すことができます。
-
-本ソフトウェアは「現状有姿」で提供され、商品性、特定目的への適合性、権利非侵害を含め、
-明示または黙示を問わずいかなる保証もありません。作者は、本ソフトウェアの使用に起因する
-いかなる請求、損害、その他の責任についても、一切の責任を負いません。
+本ソフトウェアは「現状有姿」で提供され、商品性、特定目的への適合性、および権利非侵害に
+ついての保証を含むがこれらに限定されない、明示または黙示のいかなる保証もありません。
+作者または著作権者は、契約行為、不法行為、またはそれ以外であろうと、本ソフトウェアに
+起因または関連し、あるいは本ソフトウェアの使用またはその他の取り扱いによって生じる
+一切の請求、損害、その他の義務について、何らの責任も負わないものとします。
 
 *Note: This Japanese text is a reference translation for convenience. In the
 event of any conflict or ambiguity between the English and Japanese versions,
