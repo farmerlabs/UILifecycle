@@ -1,28 +1,30 @@
-# 007 — Additive Scene から供給する
+# 007 — supplying the page from an additive scene
 
-**ページを Prefab ではなくシーンから調達する。** 001〜004 の升目とも 005 の寿命とも直交する軸（供給手段）だけを扱う。
+**English** | [日本語](README.ja.md)
 
-| Key | Kind | Policy | 実体 |
+**Acquire the page from a scene instead of a prefab.** This covers one axis orthogonal both to the 001–004 grid and to 005's lifetime: the means of acquisition.
+
+| Key | Kind | Policy | Instance |
 |---|---|---|---|
-| `SceneDialog` | `AdditiveScene` | `Transient` | `007_PageScene` を Additive ロード、閉じたら Unload |
+| `SceneDialog` | `AdditiveScene` | `Transient` | loads `007_PageScene` additively, unloads it on close |
 
-供給手段は `ProviderKind` の 1 値でしかない。**呼び側にも Bootstrap にもコードは 1 行も要らない**（001 と同じ）。
+The means of acquisition is a single `ProviderKind` value. **Neither the caller nor a bootstrap needs one line of code** (same as 001).
 
-## 構成
+## What is in the folder
 
-| | 中身 |
+| | Contents |
 |---|---|
-| `UiRegistry.asset` | 上表の 1 エントリ。`007_PageScene` を作ったら `Scene` 欄にドロップする（`Scene Name` に自動反映） |
-| `007_PageScene.unity` | Root に `UiPage`、その下に Canvas と `UiCancelButton`。**EventSystem / Camera は置かない** |
-| `007_SampleScene.unity` | `Button_Show` に `UiShowButton`、`Button_Hide` に `UiHideButton`。EventSystem はこちら側だけ |
+| `UiRegistry.asset` | the entry above. Once `007_PageScene` exists, drop it into the `Scene` field (it mirrors into `Scene Name`) |
+| `007_PageScene.unity` | `UiPage` on the root, with a Canvas and a `UiCancelButton` beneath. **No EventSystem, no Camera** |
+| `007_SampleScene.unity` | `UiShowButton` on `Button_Show`, `UiHideButton` on `Button_Hide`. The EventSystem lives only here |
 
-C# ファイルは無い。**両シーンを Build Settings の Scenes In Build に追加すること**（忘れると `Scene couldn't be loaded` で落ちる）。
+There is no C# file. **Both scenes must be added to Scenes In Build** in Build Settings, or it fails with `Scene couldn't be loaded`.
 
-## 見どころ
+## What to look for
 
-- **Prefab と扱いがまったく同じ。** 呼び側は `key` しか知らず、Registry で `Kind` を差し替えるだけで Prefab ⇄ Scene が入れ替わる。許容 Policy も Prefab と同じ（`Cached` / `Transient`）
-- **`ShowAsync` が最初から `UniTask` なのはこのため。** シーンロードは原理的に同期取得できない。Prefab では同フレームで返っていた await が、ここで初めて実時間かかる
-- **`Construct` は `Start` より前**（Prefab と同じ）。`AdditiveSceneProvider` が `sceneLoaded`（= `Awake` の直後・`Start` の前）で Root を落としているため。ロード直後の素の状態も 1 フレームも見えない
-- **ロード中に `Button_Hide` を押しても握り潰されない。** 調達中は `EntryPoint` がまだ無いので、`UiHost` が要求を預かり `Construct` 直後に効かせる — 「入場演出中の Hide」（006）と同じ挙動になる
-- **ロード自体は中断しない。** 半ロードのシーンの後始末と `ShowAsync` の戻り契約が増えるため、途中で切るのではなく上記の預かりで揃えている
-- **`Persistent` は選べない**。「シーンに配置済み＝基盤は調達しない」の意味なので、常駐させたいなら起動時に自前でロードして `UiSceneAnchor`（= `SceneObject` / `Persistent`）を使う
+- **It is handled exactly like a prefab.** The caller knows only the key, and swapping `Kind` in the Registry exchanges prefab for scene. The allowed policies are the same as for a prefab (`Cached` / `Transient`)
+- **This is why `ShowAsync` is a `UniTask` from the start.** Loading a scene cannot be done synchronously. The await that returned within the same frame for a prefab now takes real time
+- **`Construct` still happens before `Start`** (as with a prefab), because `AdditiveSceneProvider` hides the root in `sceneLoaded` — after `Awake` and before `Start`. The raw state is never visible, not even for one frame
+- **Pressing `Button_Hide` during the load is not swallowed.** No `EntryPoint` exists yet, so `UiHost` holds the request and applies it right after `Construct` — the same behavior as "Hide during the enter transition" in 006
+- **The load itself is not interrupted.** Cleaning up a half-loaded scene would add to the return contract of `ShowAsync`, so requests are unified through the holding behavior above instead
+- **`Persistent` cannot be chosen.** It means "already placed in the scene, so the foundation does not acquire it". To keep a scene UI resident, load it yourself at startup and use `UiSceneAnchor` (= `SceneObject` / `Persistent`)

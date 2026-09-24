@@ -7,13 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-25
+
 ### Changed
 
-- Relicensed under the MIT License.
-- Split the documentation into English (`README.md`) and Japanese (`README.ja.md`).
-- Rewrote the installation guide for a public repository.
+- Translated the sample documentation into English. Each sample folder now has a
+  `README.md` (English) alongside a `README.ja.md` (Japanese).
+- Noted in the sample index that the samples additionally require TextMeshPro.
 
-## [0.1.0] - 2026-08-09
+## [0.1.0] - 2026-09-25
 
 ### Added
 
@@ -25,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pluggable transitions through `UiTransitionPresenterBehaviour`, composed in `Parallel` or `Sequential` mode.
 - Custom acquisition via `UiHost.RegisterProvider`.
 - Eight sample scenes and PlayMode tests.
+- Documentation in English and Japanese, with the Japanese version as the authoritative one.
 
-[Unreleased]: https://github.com/Farmer0116/UILifecycle/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Farmer0116/UILifecycle/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/Farmer0116/UILifecycle/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/Farmer0116/UILifecycle/releases/tag/v0.1.0

@@ -1,25 +1,27 @@
-# 005 — LifetimePolicy の使い分け
+# 005 — choosing a LifetimePolicy
 
-**同じページを Policy 違いの 3 つの Key で開き比べる。** 001〜004 と直交する軸（寿命）だけを扱う。
+**English** | [日本語](README.ja.md)
 
-| Key | Policy | 実体 |
+**The same page opened through three keys that differ only in Policy.** This covers one axis orthogonal to 001–004: lifetime.
+
+| Key | Policy | Instance |
 |---|---|---|
-| `Transient` | 表示ごとに生成、閉じたら破棄 | Prefab |
-| `Cached` | 初回だけ生成、以後再利用（閉 = 非表示） | Prefab |
-| `Persistent` | シーン常駐。基盤は生成/破棄しない | シーン上の GameObject + `UiSceneAnchor` |
+| `Transient` | created per showing, destroyed on close | prefab |
+| `Cached` | created once, reused afterwards (closing = hiding) | prefab |
+| `Persistent` | resident in the scene; the foundation neither creates nor destroys it | a GameObject in the scene plus `UiSceneAnchor` |
 
-## 構成
+## What is in the folder
 
-| | 中身 |
+| | Contents |
 |---|---|
-| `PolicyProbePage.cs` | 「instance #n / shown xN」を表示するだけ（n = Awake 起点、N = OnShow 起点） |
-| `Page.prefab` | Root に `PolicyProbePage`、閉じるボタンに `UiCancelButton` |
-| `UiRegistry.asset` | 上表の 3 エントリ |
-| `005_SampleScene.unity` | Key ごとに `UiShowButton` / `UiHideButton` のペア 3 組。Persistent 用ページはシーンに直接置き `UiSceneAnchor` で登録 |
+| `PolicyProbePage.cs` | displays "instance #n / shown xN" (n counted from Awake, N from OnShow) |
+| `Page.prefab` | `PolicyProbePage` on the root, `UiCancelButton` on the close button |
+| `UiRegistry.asset` | the three entries above |
+| `005_SampleScene.unity` | a `UiShowButton` / `UiHideButton` pair per key. The Persistent page sits in the scene and registers through `UiSceneAnchor` |
 
-## 見どころ
+## What to look for
 
-- **`Transient`**: 開くたび `instance #` が進み、`shown` は常に x1 — 毎回作り直されている
-- **`Cached` / `Persistent`**: `instance #` は固定で `shown` が進む — 実体が残っている
-- **どれも `OnShow` は毎回走る**（挙動は同一、差はメモリと調達コストだけ）。`Cached` でも表示内容が古くならないのはこのため
-- `UiSceneAnchor` は Awake で自己登録する。**非アクティブだと Awake が走らず登録されない**ので、初期非表示は `_hideOnAwake`（既定 ON）で行う
+- **`Transient`**: `instance #` advances on every open and `shown` stays at x1 — it is rebuilt each time
+- **`Cached` / `Persistent`**: `instance #` is fixed and `shown` advances — the instance survives
+- **`OnShow` runs every time under all three** (identical behavior; only memory and acquisition cost differ). This is why a `Cached` page never shows stale content
+- `UiSceneAnchor` registers itself in `Awake`. **An inactive GameObject never runs `Awake`, so it never registers** — hide it initially with `_hideOnAwake` (on by default) instead

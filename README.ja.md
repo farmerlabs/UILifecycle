@@ -54,7 +54,7 @@ if (result.HasValue)
 そのうえで Package Manager > `+` > *Add package from git URL...*:
 
 ```
-https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.0
+https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.1
 ```
 
 タグは必ず明示してください。UniTask を git URL で入れる手順を含む詳細は [パッケージ README](Packages/com.farmerlab.uilifecycle/README.ja.md#2-インストール) にあります。

@@ -63,10 +63,10 @@ https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask
 Package Manager > `+` > *Add package from git URL...*
 
 ```
-https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.0
+https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.1
 ```
 
-`?path=` はリポジトリ内のパッケージ位置、`#v0.1.0` は取得するタグです。
+`?path=` はリポジトリ内のパッケージ位置、`#v0.1.1` は取得するタグです。
 タグを省略するとデフォルトブランチの最新が取得され、予告なく変わります。**バージョンを固定するためタグを明示してください。**
 
 `manifest.json` に直接書く場合:
@@ -74,7 +74,7 @@ https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilife
 ```jsonc
 {
   "dependencies": {
-    "com.farmerlab.uilifecycle": "https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.0"
+    "com.farmerlab.uilifecycle": "https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.1"
   }
 }
 ```
@@ -93,7 +93,7 @@ Package Manager > 本パッケージを選択 > **Samples** タブ > *Sample UI 
 以下に展開されます。
 
 ```
-Assets/Samples/Farmer Lab UI Lifecycle/0.1.0/Sample UI Lifecycle/
+Assets/Samples/Farmer Lab UI Lifecycle/0.1.1/Sample UI Lifecycle/
 ```
 
 001〜008 の番号付きフォルダに、機能ごとのシーンと解説 README が入っています。まず `001` のシーンを開いて再生するのが最短です。

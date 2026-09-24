@@ -1,28 +1,30 @@
-# 002 — 待機なし / 引数あり / 返り値なし
+# 002 — no awaiting / args / no result
 
-**001 に「引数」だけ足した形。** 型付きデータが流れるので、初めてページクラスを書く。
-ただし書くのは流れる部分（`args.Message`）だけ — 閉じは 001 と同じ `UiCancelButton`（コード 0 行）。
+**English** | [日本語](README.ja.md)
 
-| 項目 | 内容 |
+**001 with arguments added.** Typed data now flows, so this is the first sample that writes a page class.
+Only the part that carries data is written (`args.Message`) — closing is still `UiCancelButton`, as in 001, with no code.
+
+| Item | Detail |
 |---|---|
-| 呼び側 | `Sample002Bootstrap` → `ShowAsync(key, args)` |
-| 閉じ方 | 子: `UiCancelButton`（ページ内） / 親: `UiHideButton`（シーン側） |
-| ページ基底 | `UiEntryPoint<ToastArgs>`（= `<ToastArgs, Unit>`。`Unit` は書かない） |
-| await が返る時点 | 入場演出完了 (Shown)。001 と同じ |
+| Caller | `Sample002Bootstrap` → `ShowAsync(key, args)` |
+| How it closes | child: `UiCancelButton` (inside the page) / parent: `UiHideButton` (in the scene) |
+| Page base class | `UiEntryPoint<ToastArgs>` (= `<ToastArgs, Unit>`; you never write `Unit`) |
+| When the await returns | at Shown (enter transition complete), same as 001 |
 
-## 構成
+## What is in the folder
 
-| | 中身 |
+| | Contents |
 |---|---|
-| `ToastArgs.cs` | 表示引数（readonly struct） |
-| `ToastPage.cs` | `OnShow(args)` でメッセージを組み立てるだけ |
-| `Page.prefab` | Root に `ToastPage`、OK ボタンに `UiCancelButton` |
+| `ToastArgs.cs` | the show arguments (a readonly struct) |
+| `ToastPage.cs` | `OnShow(args)` just assembles the message |
+| `Page.prefab` | `ToastPage` on the root, `UiCancelButton` on the OK button |
 | `UiRegistry.asset` | Key = `Toast` / Policy = `Transient` / Kind = `Prefab` |
-| `002_SampleScene.unity` | `Button_Show` + `Sample002Bootstrap`（開くたびに連番付きの文言を渡す）、`Button_Hide` に `UiHideButton` |
+| `002_SampleScene.unity` | `Button_Show` plus `Sample002Bootstrap` (passes a numbered message each time), `UiHideButton` on `Button_Hide` |
 
-## 見どころ
+## What to look for
 
-- **引数は「開くたび」に渡す**: 生成時 1 回ではないので、2 回目以降も `OnShow(args)` が走り毎回の文言で組み立て直される
-- 開くボタンを連打しても**表示中の再入は無視**される（`await` は必ず返るので呼び側は固まらない）
-- 開くのはコード（引数が要る）、閉じるのはコンポーネントで足りる（データが流れない）— 層の境界が開閉で非対称になる例
-- 結果を返す閉じ方は 003 / 004 を参照。Policy の使い分けは 005 を参照
+- **Arguments are passed on every showing**, not once at creation. `OnShow(args)` runs again on the second and later showings, rebuilding from that showing's message
+- Hammering the open button does nothing: **re-entry while shown is ignored**. The `await` still returns, so the caller never hangs
+- Opening needs code (arguments are involved); closing does not (no data flows). The boundary between the two tiers is asymmetric between opening and closing
+- For closing with a result, see 003 / 004. For choosing a Policy, see 005

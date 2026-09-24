@@ -1,28 +1,30 @@
-# 001 — 待機なし / 引数なし / 返り値なし
+# 001 — no awaiting / no args / no result
 
-**コード 0 行。** 設定画面・クレジット・ヘルプなど、型付きデータが流れない UI はここで足りる。
+**English** | [日本語](README.ja.md)
 
-| 項目 | 内容 |
+**Zero lines of code.** A settings screen, a credits page, a help dialog — any UI with no typed data flowing through it is covered here.
+
+| Item | Detail |
 |---|---|
-| 呼び側 | `UiShowButton`（= `ShowAsync(key)`）/ `UiHideButton`（= `HideAsync(key)`） |
-| 閉じ方 | 子: `UiCancelButton`（ページ内） / 親: `UiHideButton`（シーン側） |
-| ページ基底 | `UiPage` |
-| await が返る時点 | 入場演出完了 (Shown)。閉じるのは待たない |
+| Caller | `UiShowButton` (= `ShowAsync(key)`) / `UiHideButton` (= `HideAsync(key)`) |
+| How it closes | child: `UiCancelButton` (inside the page) / parent: `UiHideButton` (in the scene) |
+| Page base class | `UiPage` |
+| When the await returns | at Shown (enter transition complete). It does not wait for the close |
 
-## 構成
+## What is in the folder
 
-| | 中身 |
+| | Contents |
 |---|---|
-| `Page.prefab` | Root に `UiPage`、`CloseButton` に `UiCancelButton`（Key 不要 — 親のページを自動で拾う） |
+| `Page.prefab` | `UiPage` on the root, `UiCancelButton` on `CloseButton` (no key — it finds its own page) |
 | `UiRegistry.asset` | Key = `Dialog` / Policy = `Transient` / Kind = `Prefab` / Prefab = `Page.prefab` |
-| `001_SampleScene.unity` | `Button_Show` に `UiShowButton`、`Button_Hide` に `UiHideButton`（どちらも Registry + Key = `Dialog`） |
+| `001_SampleScene.unity` | `UiShowButton` on `Button_Show`, `UiHideButton` on `Button_Hide` (both with Registry + Key = `Dialog`) |
 
-## 見どころ
+## What to look for
 
-- **スクリプトが 1 つも無い。** 開閉・演出待ち・寿命管理・再入ゲートが全部効いている
-- **コンポーネント 3 種が全部揃う**: 開く = `UiShowButton`（親）/ 閉じる = `UiHideButton`（親）と `UiCancelButton`（子）。成立する升目はこの 3 つだけ（パッケージ README §4-4）
-- `UiHideButton` は対象が開いていなければ**黙って no-op**（押しても何も起きないのが正常系）
-- `Transient` なので閉じると実体は破棄される。開き直すと作り直される
-- 結果を返す閉じ方は 003 / 004 を参照
+- **There is not a single script.** Opening, closing, awaiting transitions, lifetime management and the re-entry gate are all in effect
+- **All three components appear**: open = `UiShowButton` (parent), close = `UiHideButton` (parent) and `UiCancelButton` (child). These are the only three cells that exist (package README §4-4)
+- `UiHideButton` is a **silent no-op** when its target is not shown — pressing it and seeing nothing happen is the normal case
+- Because the Policy is `Transient`, the instance is destroyed on close and rebuilt when reopened
+- For closing with a result, see 003 / 004
 
-コードから開く形は 002 以降で扱う。
+Opening from code is covered from 002 onward.
