@@ -1,5 +1,9 @@
 # UI Lifecycle for Unity
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+[![Unity](https://img.shields.io/badge/Unity-2022.3%2B-black?logo=unity)](https://unity.com/)
+[![Release](https://img.shields.io/github/v/tag/Farmer0116/UILifecycle?label=release&sort=semver)](https://github.com/Farmer0116/UILifecycle/releases)
+
 **English** | [日本語](README.ja.md)
 
 A foundation that standardizes the presence states of a UI (Hidden / Showing / Shown / Hiding) and lets you plug "something that reports completion" into each transition point.
@@ -58,7 +62,9 @@ Always pin a tag. Full instructions, including the git-URL route for UniTask, ar
 ## Documentation
 
 - [Package README](Packages/com.farmerlab.uilifecycle/README.md) — setup, vocabulary, API guide and current limitations
-- [Samples](Packages/com.farmerlab.uilifecycle/Samples~/UiLifecycle) — eight numbered scenes, one feature each. Import them from the Samples tab in Package Manager and open `001` first.
+- [Samples](Packages/com.farmerlab.uilifecycle/Samples~/UiLifecycle) — eight numbered scenes, one feature each. Import them from the Samples tab in Package Manager and open `001` first. The samples additionally require TextMeshPro.
+- [CHANGELOG](Packages/com.farmerlab.uilifecycle/CHANGELOG.md)
+- [CONTRIBUTING](CONTRIBUTING.md) — how to report a bug or propose a change
 
 ## Repository layout
 
@@ -71,6 +77,15 @@ Packages/com.farmerlab.uilifecycle/   the distributed package
 └── Samples~/UiLifecycle/             sample scenes 001-008
 ```
 
-## License
+## Project status
 
+Maintained by one author in their spare time, and published primarily as a
+showcase of that author's work. **Pull requests are generally not accepted.**
+Bug reports are welcome, though replies may be slow. If you need a change, fork
+it — the MIT license allows that. See [CONTRIBUTING](CONTRIBUTING.md).
+
+The Japanese documents are the authoritative version; the English ones are
+translations.
+
+## License
 [MIT License](LICENSE.md). Copyright (c) 2026 Farmer Lab.

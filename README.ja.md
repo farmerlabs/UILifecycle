@@ -1,5 +1,9 @@
 # UI Lifecycle for Unity
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+[![Unity](https://img.shields.io/badge/Unity-2022.3%2B-black?logo=unity)](https://unity.com/)
+[![Release](https://img.shields.io/github/v/tag/Farmer0116/UILifecycle?label=release&sort=semver)](https://github.com/Farmer0116/UILifecycle/releases)
+
 [English](README.md) | **日本語**
 
 UI の存在状態（Hidden / Showing / Shown / Hiding）を標準化し、遷移点に「完了を返せる何か」を差せるようにする基盤。
@@ -58,7 +62,9 @@ https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilife
 ## ドキュメント
 
 - [パッケージ README](Packages/com.farmerlab.uilifecycle/README.ja.md) — 導入手順、語彙の規則、API ガイド、現時点の制約
-- [サンプル](Packages/com.farmerlab.uilifecycle/Samples~/UiLifecycle) — 機能ごとに 1 つずつ、8 本の番号付きシーン。Package Manager の Samples タブからインポートし、まず `001` を開いてください。
+- [サンプル](Packages/com.farmerlab.uilifecycle/Samples~/UiLifecycle) — 機能ごとに 1 つずつ、8 本の番号付きシーン。Package Manager の Samples タブからインポートし、まず `001` を開いてください。サンプルの実行には別途 TextMeshPro が必要です。
+- [CHANGELOG](Packages/com.farmerlab.uilifecycle/CHANGELOG.md)
+- [コントリビューションガイド](CONTRIBUTING.ja.md) — バグ報告と変更提案の方法
 
 ## リポジトリ構成
 
@@ -71,6 +77,11 @@ Packages/com.farmerlab.uilifecycle/   配布されるパッケージ
 └── Samples~/UiLifecycle/             サンプルシーン 001-008
 ```
 
-## ライセンス
+## 運営方針
 
+作者ひとりが空き時間で保守しており、公開の主目的は作者自身の成果物の公開です。**プルリクエストは原則受け付けていません。** バグ報告は歓迎しますが、返信は遅いことがあります。変更が必要なら fork してください（MIT ライセンスはそれを許しています）。詳細は [コントリビューションガイド](CONTRIBUTING.ja.md) を参照してください。
+
+日本語版のドキュメントが正本で、英語版はその翻訳です。
+
+## ライセンス
 [MIT License](LICENSE.md). Copyright (c) 2026 Farmer Lab.

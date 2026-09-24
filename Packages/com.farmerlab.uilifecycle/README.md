@@ -86,6 +86,9 @@ Open Unity; once it compiles, installation is done.
 
 ### 2-3. Import the samples (optional)
 
+> **The samples additionally require TextMeshPro** (`com.unity.textmeshpro`), and will not compile without it.
+> The runtime package itself does not use TextMeshPro, so it is not declared as a dependency — install it from Package Manager if your project does not already have it.
+
 Package Manager > select this package > **Samples** tab > **Import** on *Sample UI Lifecycle*
 
 It expands to:

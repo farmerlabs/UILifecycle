@@ -85,6 +85,9 @@ Unity を開いてコンパイルが通れば導入完了。
 
 ### 2-3. サンプルをインポート（任意）
 
+> **サンプルの実行には TextMeshPro（`com.unity.textmeshpro`）が別途必要**で、無いとコンパイルが通りません。
+> Runtime 本体は TextMeshPro を使わないため `dependencies` には宣言していません。プロジェクトに未導入の場合は Package Manager から入れてください。
+
 Package Manager > 本パッケージを選択 > **Samples** タブ > *Sample UI Lifecycle* の **Import**
 
 以下に展開されます。
