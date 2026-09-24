@@ -1,0 +1,52 @@
+name: Bug report
+description: Report something that does not behave as documented.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. The more precisely the problem can be reproduced, the faster it can be fixed.
+  - type: input
+    id: unity-version
+    attributes:
+      label: Unity version
+      placeholder: "2022.3.20f1"
+    validations:
+      required: true
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      description: The tag or commit you installed.
+      placeholder: "v0.1.0"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: The smallest sequence that shows the problem. A stripped-down scene or a failing test is ideal.
+      placeholder: |
+        1. Register a key with Policy = Transient, Kind = Prefab
+        2. Call ShowAsync("Key")
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: registry
+    attributes:
+      label: Registry entry
+      description: Policy, Kind and anything unusual about the entry involved.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console output
+      description: Exceptions or warnings, if any. This is rendered as code, so no backticks are needed.
+      render: text
