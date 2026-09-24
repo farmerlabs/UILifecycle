@@ -64,10 +64,10 @@ https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask
 Package Manager > `+` > *Add package from git URL...*
 
 ```
-https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.0
+https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.1
 ```
 
-`?path=` points to the package folder inside the repository; `#v0.1.0` is the tag to fetch.
+`?path=` points to the package folder inside the repository; `#v0.1.1` is the tag to fetch.
 Omitting the tag fetches the tip of the default branch, which can change without notice. **Always pin a tag.**
 
 Or write it directly in `manifest.json`:
@@ -75,7 +75,7 @@ Or write it directly in `manifest.json`:
 ```jsonc
 {
   "dependencies": {
-    "com.farmerlab.uilifecycle": "https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.0"
+    "com.farmerlab.uilifecycle": "https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.1"
   }
 }
 ```
@@ -94,7 +94,7 @@ Package Manager > select this package > **Samples** tab > **Import** on *Sample 
 It expands to:
 
 ```
-Assets/Samples/Farmer Lab UI Lifecycle/0.1.0/Sample UI Lifecycle/
+Assets/Samples/Farmer Lab UI Lifecycle/0.1.1/Sample UI Lifecycle/
 ```
 
 Numbered folders 001 through 008 each hold a scene and a README for one feature. The quickest start is to open the `001` scene and press Play.

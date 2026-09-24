@@ -54,7 +54,7 @@ This package is installed from a git URL. UniTask must be resolvable first — t
 Then, in Package Manager > `+` > *Add package from git URL...*:
 
 ```
-https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.0
+https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.1
 ```
 
 Always pin a tag. Full instructions, including the git-URL route for UniTask, are in the [package README](Packages/com.farmerlab.uilifecycle/README.md#2-installation).

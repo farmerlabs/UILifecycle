@@ -1,6 +1,6 @@
 {
   "name": "com.farmerlab.uilifecycle",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "Farmer Lab UI Lifecycle",
   "description": "Standardizes the presence states of a UI and lets you plug something that reports completion into each transition point.",
   "documentationUrl": "https://github.com/Farmer0116/UILifecycle",
