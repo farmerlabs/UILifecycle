@@ -1,45 +1,50 @@
-# UiLifecycle サンプル
+# UiLifecycle samples
 
-**番号順に読むと、1 要素ずつ足されていく。** 軸の直積ではなく読む順で並べてある。
+**English** | [日本語](README.ja.md)
 
-| # | 待機 | 引数 | 返り値 | 呼び側 API | ページ基底 |
+**Read them in order: each one adds a single element.** They are arranged by reading order, not as a cartesian product of the axes.
+
+| # | Awaits | Args | Result | Caller API | Page base class |
 |---|---|---|---|---|---|
-| [001](001/) | なし | なし | なし | `ShowAsync(key)` | `UiPage`（コード 0 行） |
-| [002](002/) | なし | あり | なし | `ShowAsync(key, args)` | `UiEntryPoint<TArgs>` |
-| [003](003/) | あり | なし | あり | `ShowForResultAsync<TResult>(key)` | `UiEntryPointForResult<TResult>` |
-| [004](004/) | あり | あり | あり | `ShowForResultAsync<TArgs, TResult>(key, args)` | `UiEntryPoint<TArgs, TResult>` |
+| [001](001/) | no | no | no | `ShowAsync(key)` | `UiPage` (zero lines of code) |
+| [002](002/) | no | yes | no | `ShowAsync(key, args)` | `UiEntryPoint<TArgs>` |
+| [003](003/) | yes | no | yes | `ShowForResultAsync<TResult>(key)` | `UiEntryPointForResult<TResult>` |
+| [004](004/) | yes | yes | yes | `ShowForResultAsync<TArgs, TResult>(key, args)` | `UiEntryPoint<TArgs, TResult>` |
 
-005 以降は**この升目と直交する軸**を 1 つずつ扱う（1 サンプル 1 主題）。
-どれも 001〜004 のどの象限とも組み合わせられる。
+From 005 on, each sample covers one axis **orthogonal to that grid** (one subject per sample).
+Every one of them combines with any quadrant of 001–004.
 
-| # | 軸 | 比べるもの |
+| # | Axis | What it compares |
 |---|---|---|
-| [005](005/) | 寿命 | `LifetimePolicy` = `Transient` / `Cached` / `Persistent` |
-| [006](006/) | 演出 | Presenter が 0 個 / 1 個 / 複数（`Parallel` / `Sequential`） |
-| [007](007/) | 供給手段 | `ProviderKind` = `AdditiveScene`（Prefab との差は Registry の 1 値だけ） |
-| [008](008/) | 供給手段 | `ProviderKind` = `Custom`（調達を外から差す。例として生成先を指定） |
+| [005](005/) | lifetime | `LifetimePolicy` = `Transient` / `Cached` / `Persistent` |
+| [006](006/) | transitions | 0, 1 or several presenters (`Parallel` / `Sequential`) |
+| [007](007/) | acquisition | `ProviderKind` = `AdditiveScene` (one Registry value apart from `Prefab`) |
+| [008](008/) | acquisition | `ProviderKind` = `Custom` (plug acquisition in from outside; here, choosing the parent) |
 
-## なぜ 4 通りなのか（8 でも 6 でもなく）
+## Why four, and not eight or six
 
-軸は 3 つ（待機 / 引数 / 返り値）に見えるが、**待機と返り値は独立していない**。
-結果の受取口が `await` の戻り値しかないので:
+There appear to be three axes (awaiting / args / result), but **awaiting and result are not independent**.
+The only place a result can be received is the return value of the `await`, so:
 
-- 「**返り値あり × 待たない**」は原理的に存在しない（受け取る場所がない）
-- 「**返り値なし × 待つ**」は待つ動機がない。「閉じるまで待ちたいが結果は要らない」場合は
-  003 / 004 で受けて `HasValue` だけ見ればよい（キャンセル系は全経路 `HasValue=false` に統一済み）
+- "**result, without awaiting**" cannot exist — there is nowhere to receive it
+- "**no result, but awaiting**" has no motivation. If you want to wait until it closes but do not need a
+  result, use 003 / 004 and look only at `HasValue` (every cancellation path is unified to `HasValue = false`)
 
-残る自由度は **引数の有無 × 待つか** の 2×2 = 4。
-これは `IUiHost` の 4 メソッドとも、ページ基底の 4 象限とも一致する。
+What remains is **args or no args × awaiting or not** = 4.
+That matches both the four methods on `IUiHost` and the four page base classes.
 
-## 共通の作法
+## Conventions shared by every sample
 
-- **`Unit` はどこにも現れない**。呼び側 4 メソッド / ページ基底 4 種で全象限が覆われている
-- `registry.Host` が Registry SO の持つ共有 `UiHost`（遅延生成）。
-  自前で `new UiHost(registry)` してもよいが、再入ゲートは Host 単位なので同一 Registry で混在させない
-- 各サンプルは**自己完結**（専用の Scene / Registry.asset / Prefab を持つ）
-- `OnShow(args)` は**表示のたび**に呼ばれる。Policy を変えても挙動は変わらない（差はメモリと調達コストだけ）
+- **`Unit` appears nowhere.** Four caller methods and four page base classes cover every quadrant
+- `registry.Host` is the shared `UiHost` held by the Registry ScriptableObject (created lazily).
+  You may `new UiHost(registry)` yourself, but the re-entry gate is per Host, so do not mix the two on one Registry
+- Each sample is **self-contained** (its own scene, Registry asset and prefab)
+- `OnShow(args)` runs **on every showing**. Changing the Policy does not change that; it only changes memory
+  use and acquisition cost
 
-## シーン / Prefab / Registry の作り方
+## Creating the scenes, prefabs and registries
 
-各フォルダの README に手順がある。C# 以外（`.unity` / `.prefab` / `.asset`）は
-Unity エディタ上で作成すること。
+Each folder's README has the steps. Everything that is not C# (`.unity`, `.prefab`, `.asset`) has to be
+created in the Unity editor.
+
+> The samples require **TextMeshPro** in addition to this package.

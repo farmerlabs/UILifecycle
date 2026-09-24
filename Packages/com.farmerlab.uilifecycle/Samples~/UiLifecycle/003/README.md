@@ -1,30 +1,32 @@
-# 003 — 待機あり / 引数なし / 返り値あり
+# 003 — awaiting / no args / result
 
-**await が「閉じた後」まで伸びる最初のサンプル。** 入力フォームは「渡すものはないが返すものはある」の典型。
+**English** | [日本語](README.ja.md)
 
-| 項目 | 内容 |
+**The first sample where the await extends past the close.** An input form is the archetype of "nothing to pass in, something to return".
+
+| Item | Detail |
 |---|---|
-| 呼び側 | `Sample003Bootstrap` → `ShowForResultAsync<string>(key)` |
-| 閉じ方 | 決定 = `Close(_input.text)`（コード） / キャンセル = `UiCancelButton`（子）・`UiHideButton`（親） |
-| ページ基底 | `UiEntryPointForResult<string>`（= `<Unit, string>`。`Unit` は書かない） |
-| await が返る時点 | **相手が閉じた後**（結果つき） |
+| Caller | `Sample003Bootstrap` → `ShowForResultAsync<string>(key)` |
+| How it closes | commit = `Close(_input.text)` (code) / cancel = `UiCancelButton` (child), `UiHideButton` (parent) |
+| Page base class | `UiEntryPointForResult<string>` (= `<Unit, string>`; you never write `Unit`) |
+| When the await returns | **after the page has closed**, with a result |
 
-`ShowAsync` との差は await が返る時点で、名前に出してある
-（Android の `startActivity` / `startActivityForResult` と同じ分離）。
-結果の受取口は **await の戻り値だけ** — だから「返り値あり × 待たない」は原理的に存在しない。
+The difference from `ShowAsync` is when the await returns, and that difference is in the name
+(the same split as Android's `startActivity` / `startActivityForResult`).
+The only place a result can be received is the return value of the await — which is why "result, without awaiting" cannot exist.
 
-## 構成
+## What is in the folder
 
-| | 中身 |
+| | Contents |
 |---|---|
-| `NameInputPage.cs` | `OnShow` で入力欄を初期化し、決定ボタンだけ購読（`Close(_input.text)`） |
-| `Page.prefab` | Root に `NameInputPage`、`Button_Ok` を `_decideButton` に割り当て、`Button_Cancel` に `UiCancelButton` |
+| `NameInputPage.cs` | `OnShow` initializes the input field and subscribes only the decide button (`Close(_input.text)`) |
+| `Page.prefab` | `NameInputPage` on the root, `Button_Ok` assigned to `_decideButton`, `UiCancelButton` on `Button_Cancel` |
 | `UiRegistry.asset` | Key = `NameInput` / Policy = `Transient` / Kind = `Prefab` |
-| `003_SampleScene.unity` | `Button_Show` + `Sample003Bootstrap`（結果表示の TMP_Text つき）、`Button_Hide(Cancel)` に `UiHideButton` |
+| `003_SampleScene.unity` | `Button_Show` plus `Sample003Bootstrap` (with a TMP_Text for the result), `UiHideButton` on `Button_Hide(Cancel)` |
 
-## 見どころ
+## What to look for
 
-- **確定を作れるのは子だけ**: `HasValue = true` ⇔ ページが `Close(result)` を呼んだ。決定側だけコードを書くのはそのため
-- **キャンセル経路は全部同じ形で返る**: `UiCancelButton`（子）/ `UiHideButton`（親）/ 再入無視、どれも `HasValue = false`。呼び側の分岐は `if (result.HasValue)` 1 個で済む
-- 入力中に `Button_Hide(Cancel)` を押すと、**待っている Bootstrap の await が `HasValue = false` で返る**のを実際に確かめられる
-- `await` が永遠に返らない状態は不変条件として禁止されている
+- **Only the child can produce a commit**: `HasValue = true` ⇔ the page called `Close(result)`. That is why code is written only on the decide path
+- **Every cancellation path returns the same shape**: `UiCancelButton` (child), `UiHideButton` (parent) and ignored re-entry all give `HasValue = false`. The caller needs one branch, `if (result.HasValue)`
+- Press `Button_Hide(Cancel)` while typing and you can watch **the waiting Bootstrap's await return with `HasValue = false`**
+- An await that never returns is forbidden as an invariant

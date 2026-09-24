@@ -1,33 +1,35 @@
-# 008 — Custom Provider で調達を差す
+# 008 — plugging in acquisition with a custom provider
 
-**基盤に無い調達を外から差す軸。** 最小の実例として「生成先 (parent) を指定して Instantiate する」を扱う。
-同じ Prefab・同じ Policy で、**違う場所に出る 2 つの key** を並べる。
+**English** | [日本語](README.ja.md)
 
-| Key | Kind | Policy | CustomProviderId | 生成先 |
+**The axis for plugging in acquisition the foundation does not provide.** The smallest useful example is "instantiate under a given parent".
+Two keys share one prefab and one policy, and **appear in different places**.
+
+| Key | Kind | Policy | CustomProviderId | Parent |
 |---|---|---|---|---|
-| `Dialog_Left` | `Custom` | `Transient` | `Anchor_Left` | `Anchor_Left`（シーン上の Transform） |
-| `Dialog_Right` | `Custom` | `Transient` | `Anchor_Right` | `Anchor_Right`（同上） |
+| `Dialog_Left` | `Custom` | `Transient` | `Anchor_Left` | `Anchor_Left` (a Transform in the scene) |
+| `Dialog_Right` | `Custom` | `Transient` | `Anchor_Right` | `Anchor_Right` (likewise) |
 
-Registry の 2 エントリは `CustomProviderId` 以外まったく同じ。**生成先は Registry の外側で決まる。**
+The two Registry entries are identical apart from `CustomProviderId`. **The parent is decided outside the Registry.**
 
-## 構成
+## What is in the folder
 
-| | 中身 |
+| | Contents |
 |---|---|
-| `Sample008Bootstrap.cs` | `Awake` で `RegisterProvider(id, new PrefabProvider(prefab, anchor))` を 2 つ |
-| `FadePresenter.cs` | 006 と同じフェード（`CanvasGroup.alpha`） |
-| `Page.prefab` | Root に `UiPage` + `CanvasGroup` + `FadePresenter`、`CloseButton` に `UiCancelButton`（ページ側のコードは 0 行） |
-| `UiRegistry.asset` | 上表の 2 エントリ。**Prefab 欄は空**（Prefab 参照は Bootstrap が持つ） |
-| `008_SampleScene.unity` | Canvas 下に `Anchor_Left` / `Anchor_Right`、`Button_Show_Left` / `Button_Show_Right` に `UiShowButton` |
+| `Sample008Bootstrap.cs` | registers two providers in `Awake`: `RegisterProvider(id, new PrefabProvider(prefab, anchor))` |
+| `FadePresenter.cs` | the same fade as 006 (`CanvasGroup.alpha`) |
+| `Page.prefab` | `UiPage` + `CanvasGroup` + `FadePresenter` on the root, `UiCancelButton` on `CloseButton` (no code on the page side) |
+| `UiRegistry.asset` | the two entries above. **The Prefab fields are empty** — the bootstrap holds the prefab reference |
+| `008_SampleScene.unity` | `Anchor_Left` / `Anchor_Right` under the Canvas, `UiShowButton` on `Button_Show_Left` / `Button_Show_Right` |
 
-Bootstrap の `Prefab` / `Left Anchor` / `Right Anchor` を Inspector で繋ぐこと。
+Wire the bootstrap's `Prefab`, `Left Anchor` and `Right Anchor` in the inspector.
 
-## 見どころ
+## What to look for
 
-- **`Kind` を 1 値変えるだけで調達経路が差し替わる**（007 と同じ話の反復）。呼び側は `key` しか知らないままで、`UiShowButton` はコード 0 行のまま効く
-- **Custom は「重い実装」専用ではない。** ここでは `PrefabProvider` — パッケージ標準の実装 — をそのまま `new` している。差すのは調達手段であって、依存ではない
-- **生成先は Registry に置けない。** parent はシーン内の `Transform` で、Registry は SO＝アセットなのでシーン参照を持てない。Registry に欄を足す案は「シーンから自己登録する仕掛け」を `UiSceneAnchor` に続いて 2 つ目発明する話になる。差し込み口を使えば発明は要らない
-- **演出は供給手段と直交する。** `FadePresenter` は 006 からそのまま持ってきていて、Custom で調達しても扱いは変わらない。`Transient` なので、退場フェードの完了を待ってから実体が破棄される
-- **登録は毎回 `Awake` で。** `Host` は Registry SO が遅延生成する共有インスタンスだが、再生開始時に捨てられる（ドメインリロードを切っていても前回の登録は残らない）
-- `RegisterProvider` は Show より前に済んでいればよい。`Awake` にしているのは `UiShowButton` のクリックより確実に早いから
-- **Policy は `Cached` / `Transient` のみ。** `Persistent` は「基盤が調達しない」の意味なので Custom とは組み合わせられない（005 参照）
+- **Changing one `Kind` value swaps the acquisition route** (the same point as 007, repeated). The caller still knows only the key, and `UiShowButton` still works with zero code
+- **Custom is not reserved for heavy implementations.** Here it simply constructs `PrefabProvider` — the package's own implementation. What you plug in is a means of acquisition, not a dependency
+- **The parent cannot live in the Registry.** A parent is a `Transform` in a scene, and the Registry is a ScriptableObject — an asset — so it cannot hold a scene reference. Adding a field would mean inventing a second self-registration mechanism after `UiSceneAnchor`. Using the plug-in point avoids inventing anything
+- **Transitions are orthogonal to acquisition.** `FadePresenter` is carried over unchanged from 006, and acquiring through Custom does not affect it. Being `Transient`, the instance is released after the exit fade completes
+- **Register in `Awake` every time.** `Host` is a shared instance created lazily by the Registry ScriptableObject, but it is discarded when play starts — a previous registration never survives, even with domain reload disabled
+- `RegisterProvider` only has to run before the first Show. `Awake` is used because it is reliably earlier than a `UiShowButton` click
+- **Only `Cached` and `Transient` are allowed.** `Persistent` means "the foundation does not acquire it", so it cannot combine with Custom (see 005)

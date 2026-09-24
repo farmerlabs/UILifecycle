@@ -1,29 +1,31 @@
-# 004 — 待機あり / 引数あり / 返り値あり
+# 004 — awaiting / args / result
 
-**全部入り。** 003 に引数が乗っただけで、await の性質は変わらない。
+**English** | [日本語](README.ja.md)
 
-| 項目 | 内容 |
+**Everything at once.** This is 003 with arguments added; the nature of the await is unchanged.
+
+| Item | Detail |
 |---|---|
-| 呼び側 | `Sample004Bootstrap` → `ShowForResultAsync<ItemDetailArgs, string>(key, args)` |
-| 閉じ方 | 確定 = `Close("decided")`（コード） / キャンセル = `UiCancelButton`（子）・コードの `HideAsync`（親） |
-| ページ基底 | `UiEntryPoint<ItemDetailArgs, string>` |
-| await が返る時点 | **相手が閉じた後**（結果つき） |
+| Caller | `Sample004Bootstrap` → `ShowForResultAsync<ItemDetailArgs, string>(key, args)` |
+| How it closes | commit = `Close("decided")` (code) / cancel = `UiCancelButton` (child), `HideAsync` in code (parent) |
+| Page base class | `UiEntryPoint<ItemDetailArgs, string>` |
+| When the await returns | **after the page has closed**, with a result |
 
-開閉は「対称」ではなく **in / out**。下りが `args`（呼び側 → UI）、上りが `result`（UI → 開いた本人）。
-上りの受け手が「開いた本人」に決まっているから、結果は戻り値で足りる。
+Opening and closing are not symmetric — they are in and out. Downward goes `args` (caller → UI); upward goes `result` (UI → whoever opened it).
+Because the recipient of the upward direction is fixed to "whoever opened it", a return value is enough.
 
-## 構成
+## What is in the folder
 
-| | 中身 |
+| | Contents |
 |---|---|
-| `ItemDetailArgs.cs` | 表示引数（readonly struct） |
-| `ItemDetailPage.cs` | `OnShow(args)` で表示を組み立て、決定ボタンだけ購読（`Close("decided")`） |
-| `Page.prefab` | Root に `ItemDetailPage`、`Button_Close` を `_closeButton` に割り当て、`Button_Cancel` に `UiCancelButton` |
+| `ItemDetailArgs.cs` | the show arguments (a readonly struct) |
+| `ItemDetailPage.cs` | `OnShow(args)` builds the view and subscribes only the decide button (`Close("decided")`) |
+| `Page.prefab` | `ItemDetailPage` on the root, `Button_Close` assigned to `_closeButton`, `UiCancelButton` on `Button_Cancel` |
 | `UiRegistry.asset` | Key = `ItemDetail` / Policy = `Transient` / Kind = `Prefab` |
-| `004_SampleScene.unity` | `Button_Show` / `Button_Hide` + `Sample004Bootstrap`（結果表示の TMP_Text つき） |
+| `004_SampleScene.unity` | `Button_Show` / `Button_Hide` plus `Sample004Bootstrap` (with a TMP_Text for the result) |
 
-## 見どころ
+## What to look for
 
-- 決定 → `Result: decided`、キャンセル → `(canceled)`。呼び側の分岐は `if (result.HasValue)` 1 個
-- **`Button_Hide` は 001〜003 の `UiHideButton` のコード版**（`HideAsync(key)` を Bootstrap から呼ぶ）。待っている本人の await が `HasValue = false` で返る — 親から閉じれば必ずキャンセル
-- Policy を `Transient` → `Cached` に変えても**挙動は変わらない**（どちらも毎回 `OnShow(args)`）。差はメモリと調達コストだけ。使い分けは 005 を参照
+- Commit → `Result: decided`, cancel → `(canceled)`. The caller needs one branch, `if (result.HasValue)`
+- **`Button_Hide` is the code version of `UiHideButton` from 001–003** (`HideAsync(key)` called from the Bootstrap). The waiting await returns with `HasValue = false` — closing from the parent is always a cancellation
+- Changing the Policy from `Transient` to `Cached` **does not change the behavior** (both run `OnShow(args)` every time). Only memory use and acquisition cost differ. See 005 for choosing between them
