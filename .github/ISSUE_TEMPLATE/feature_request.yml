@@ -1,0 +1,33 @@
+name: Feature request
+description: Propose a change to the API or behavior.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This package keeps a deliberately small surface area, so please start from the problem rather than the solution.
+        Note that pull requests are not accepted — please describe the problem here rather than sending an implementation.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What did you try to do, and where did the current API stop you?
+    validations:
+      required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: What you did instead
+      description: How you worked around it, and why that is unsatisfying.
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Optional. If you have a shape in mind, describe it — including what it would be called.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have read the vocabulary rules in the package README and checked that the naming fits them.
+        - label: I have checked that no existing combination of Policy and Kind already covers this.

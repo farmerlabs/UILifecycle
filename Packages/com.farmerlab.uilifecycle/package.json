@@ -2,9 +2,9 @@
   "name": "com.farmerlab.uilifecycle",
   "version": "0.1.0",
   "displayName": "Farmer Lab UI Lifecycle",
-  "description": "UI の存在状態を標準化し、遷移点に「完了を返せる何か」を差せるようにする基盤。",
+  "description": "Standardizes the presence states of a UI and lets you plug something that reports completion into each transition point.",
   "documentationUrl": "https://github.com/Farmer0116/UILifecycle",
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "MIT",
   "unity": "2022.3",
   "author": {
     "name": "Farmer Lab"
