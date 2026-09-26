@@ -7,8 +7,8 @@
       "dependencies": {},
       "url": "https://package.openupm.com"
     },
-    "com.farmerlab.uilifecycle": {
-      "version": "file:com.farmerlab.uilifecycle",
+    "com.farmerlabs.uilifecycle": {
+      "version": "file:com.farmerlabs.uilifecycle",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
