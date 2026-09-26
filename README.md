@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 [![Unity](https://img.shields.io/badge/Unity-2022.3%2B-black?logo=unity)](https://unity.com/)
-[![Release](https://img.shields.io/github/v/tag/Farmer0116/UILifecycle?label=release&sort=semver)](https://github.com/Farmer0116/UILifecycle/releases)
+[![Release](https://img.shields.io/github/v/tag/farmerlabs/UILifecycle?label=release&sort=semver)](https://github.com/farmerlabs/UILifecycle/releases)
 
 **English** | [日本語](README.ja.md)
 
@@ -54,16 +54,16 @@ This package is installed from a git URL. UniTask must be resolvable first — t
 Then, in Package Manager > `+` > *Add package from git URL...*:
 
 ```
-https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.1
+https://github.com/farmerlabs/UILifecycle.git?path=Packages/com.farmerlabs.uilifecycle#v0.1.0
 ```
 
-Always pin a tag. Full instructions, including the git-URL route for UniTask, are in the [package README](Packages/com.farmerlab.uilifecycle/README.md#2-installation).
+Always pin a tag. Full instructions, including the git-URL route for UniTask, are in the [package README](Packages/com.farmerlabs.uilifecycle/README.md#2-installation).
 
 ## Documentation
 
-- [Package README](Packages/com.farmerlab.uilifecycle/README.md) — setup, vocabulary, API guide and current limitations
-- [Samples](Packages/com.farmerlab.uilifecycle/Samples~/UiLifecycle) — eight numbered scenes, one feature each. Import them from the Samples tab in Package Manager and open `001` first. The samples additionally require TextMeshPro.
-- [CHANGELOG](Packages/com.farmerlab.uilifecycle/CHANGELOG.md)
+- [Package README](Packages/com.farmerlabs.uilifecycle/README.md) — setup, vocabulary, API guide and current limitations
+- [Samples](Packages/com.farmerlabs.uilifecycle/Samples~/UiLifecycle) — eight numbered scenes, one feature each. Import them from the Samples tab in Package Manager and open `001` first. The samples additionally require TextMeshPro.
+- [CHANGELOG](Packages/com.farmerlabs.uilifecycle/CHANGELOG.md)
 - [CONTRIBUTING](CONTRIBUTING.md) — how to report a bug or propose a change
 
 ## Repository layout
@@ -71,7 +71,7 @@ Always pin a tag. Full instructions, including the git-URL route for UniTask, ar
 This repository is a Unity project that hosts the package under `Packages/`, so the samples and tests can be run directly by opening it.
 
 ```
-Packages/com.farmerlab.uilifecycle/   the distributed package
+Packages/com.farmerlabs.uilifecycle/   the distributed package
 ├── Runtime/                          Core, EntryPoint, Provider, Registry, Transition, Components
 ├── Tests/Runtime/                    PlayMode tests
 └── Samples~/UiLifecycle/             sample scenes 001-008
@@ -88,4 +88,4 @@ The Japanese documents are the authoritative version; the English ones are
 translations.
 
 ## License
-[MIT License](LICENSE.md). Copyright (c) 2026 Farmer Lab.
+[MIT License](LICENSE.md). Copyright (c) 2026 Farmer Labs.

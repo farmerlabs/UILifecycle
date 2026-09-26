@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 [![Unity](https://img.shields.io/badge/Unity-2022.3%2B-black?logo=unity)](https://unity.com/)
-[![Release](https://img.shields.io/github/v/tag/Farmer0116/UILifecycle?label=release&sort=semver)](https://github.com/Farmer0116/UILifecycle/releases)
+[![Release](https://img.shields.io/github/v/tag/farmerlabs/UILifecycle?label=release&sort=semver)](https://github.com/farmerlabs/UILifecycle/releases)
 
 [English](README.md) | **日本語**
 
@@ -54,16 +54,16 @@ if (result.HasValue)
 そのうえで Package Manager > `+` > *Add package from git URL...*:
 
 ```
-https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilifecycle#v0.1.1
+https://github.com/farmerlabs/UILifecycle.git?path=Packages/com.farmerlabs.uilifecycle#v0.1.0
 ```
 
-タグは必ず明示してください。UniTask を git URL で入れる手順を含む詳細は [パッケージ README](Packages/com.farmerlab.uilifecycle/README.ja.md#2-インストール) にあります。
+タグは必ず明示してください。UniTask を git URL で入れる手順を含む詳細は [パッケージ README](Packages/com.farmerlabs.uilifecycle/README.ja.md#2-インストール) にあります。
 
 ## ドキュメント
 
-- [パッケージ README](Packages/com.farmerlab.uilifecycle/README.ja.md) — 導入手順、語彙の規則、API ガイド、現時点の制約
-- [サンプル](Packages/com.farmerlab.uilifecycle/Samples~/UiLifecycle) — 機能ごとに 1 つずつ、8 本の番号付きシーン。Package Manager の Samples タブからインポートし、まず `001` を開いてください。サンプルの実行には別途 TextMeshPro が必要です。
-- [CHANGELOG](Packages/com.farmerlab.uilifecycle/CHANGELOG.md)
+- [パッケージ README](Packages/com.farmerlabs.uilifecycle/README.ja.md) — 導入手順、語彙の規則、API ガイド、現時点の制約
+- [サンプル](Packages/com.farmerlabs.uilifecycle/Samples~/UiLifecycle) — 機能ごとに 1 つずつ、8 本の番号付きシーン。Package Manager の Samples タブからインポートし、まず `001` を開いてください。サンプルの実行には別途 TextMeshPro が必要です。
+- [CHANGELOG](Packages/com.farmerlabs.uilifecycle/CHANGELOG.md)
 - [コントリビューションガイド](CONTRIBUTING.ja.md) — バグ報告と変更提案の方法
 
 ## リポジトリ構成
@@ -71,7 +71,7 @@ https://github.com/Farmer0116/UILifecycle.git?path=Packages/com.farmerlab.uilife
 このリポジトリは `Packages/` 配下にパッケージを置いた Unity プロジェクトです。そのまま開けばサンプルとテストを実行できます。
 
 ```
-Packages/com.farmerlab.uilifecycle/   配布されるパッケージ
+Packages/com.farmerlabs.uilifecycle/   配布されるパッケージ
 ├── Runtime/                          Core, EntryPoint, Provider, Registry, Transition, Components
 ├── Tests/Runtime/                    PlayMode テスト
 └── Samples~/UiLifecycle/             サンプルシーン 001-008
@@ -84,4 +84,4 @@ Packages/com.farmerlab.uilifecycle/   配布されるパッケージ
 日本語版のドキュメントが正本で、英語版はその翻訳です。
 
 ## ライセンス
-[MIT License](LICENSE.md). Copyright (c) 2026 Farmer Lab.
+[MIT License](LICENSE.md). Copyright (c) 2026 Farmer Labs.

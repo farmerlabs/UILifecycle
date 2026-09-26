@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Farmer Lab
+Copyright (c) 2026 Farmer Labs
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ SOFTWARE.
 
 ## MIT ライセンス（日本語参考訳）
 
-Copyright (c) 2026 Farmer Lab
+Copyright (c) 2026 Farmer Labs
 
 本ソフトウェアおよび関連するドキュメントファイル（以下「本ソフトウェア」）の複製を取得
 するすべての人に対し、以下の条件に従うことを前提に、本ソフトウェアを無制限に取り扱うこと

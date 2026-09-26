@@ -36,7 +36,7 @@ You do not need to write the fix (it cannot be accepted anyway). Just describe
 Open an issue using the **Feature request** template.
 
 This package keeps a deliberately small API, and its names follow the vocabulary
-rules in [the package README](Packages/com.farmerlab.uilifecycle/README.md#3-vocabulary-rules).
+rules in [the package README](Packages/com.farmerlabs.uilifecycle/README.md#3-vocabulary-rules).
 A request will not necessarily be implemented, but knowing which problem you ran
 into is valuable in itself.
 

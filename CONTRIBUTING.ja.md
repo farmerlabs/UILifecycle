@@ -25,7 +25,7 @@
 
 **Feature request** テンプレートから Issue を作成してください。
 
-このパッケージは意図的に小さな API に保たれており、名前は [パッケージ README](Packages/com.farmerlab.uilifecycle/README.ja.md#3-語彙の規則) の語彙の規則に従っています。要望が必ず実装されるとは限りませんが、どんな問題に当たったかを知ること自体に価値があります。
+このパッケージは意図的に小さな API に保たれており、名前は [パッケージ README](Packages/com.farmerlabs.uilifecycle/README.ja.md#3-語彙の規則) の語彙の規則に従っています。要望が必ず実装されるとは限りませんが、どんな問題に当たったかを知ること自体に価値があります。
 
 ## ドキュメントの誤りについて
 

@@ -1,13 +1,13 @@
 {
-  "name": "com.farmerlab.uilifecycle",
-  "version": "0.1.1",
-  "displayName": "Farmer Lab UI Lifecycle",
+  "name": "com.farmerlabs.uilifecycle",
+  "version": "0.1.0",
+  "displayName": "Farmer Labs UI Lifecycle",
   "description": "Standardizes the presence states of a UI and lets you plug something that reports completion into each transition point.",
-  "documentationUrl": "https://github.com/Farmer0116/UILifecycle",
+  "documentationUrl": "https://github.com/farmerlabs/UILifecycle",
   "license": "MIT",
   "unity": "2022.3",
   "author": {
-    "name": "Farmer Lab"
+    "name": "Farmer Labs"
   },
   "dependencies": {
     "com.cysharp.unitask": "2.5.11"
